@@ -3,6 +3,9 @@ node_modules/
 # 不带斜杠的这行是给软链接准备的：node_modules 是链接时上面那行匹配不到
 node_modules
 dist/
+# android/build.ps1 的中间产物，和它从根目录 stickers/ 拷进 assets 的那份副本
+android/build/
+android/assets/stickers/
 dist_build/
 dist-new/
 dist-old/

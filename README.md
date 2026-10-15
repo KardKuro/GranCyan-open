@@ -12,6 +12,19 @@
 
 后端是单文件 Express（`server.js`），前端是一串裸 `<script>`（`js/01-core.js` … `js/71-*.js`，编号有空号）。
 
+## 下载
+
+不想自己构建的话，去 [Releases](https://github.com/KardKuro/GranCyan-open/releases) 下打好的包：
+
+- **Windows**：`GranCyan-*-win-x64.zip`，解压到一个你有写权限的文件夹（别放 `C:\Program Files`），双击 `Grancyan.exe`。不用装 Node。
+  - 聊天记录和设置存在 `%APPDATA%\Grancyan`；表情收藏、书架等文件存在解压目录的 `resources\app` 里。**升级时先把这些文件拷出来**，别直接删旧文件夹。
+  - 包没有代码签名，第一次打开 Windows 可能弹 SmartScreen，点「更多信息 → 仍要运行」。
+- **安卓**：`GranCyan-*.apk`。它只是前端，要连一台开着 GranCyan 的电脑：
+  1. 手机和电脑连同一个局域网，电脑上开着 exe（或 `node server.js`）。
+  2. 手机 App 里 设置 → 服务器地址 填 `http://电脑的局域网IP:3000`。
+  3. 电脑上 设置 里能看到「配对码」，填到手机的同一栏。
+  - 也可以用数据线 + `adb reverse tcp:3000 tcp:3000`，服务器地址留空。
+
 ## 能做什么
 
 - **对话** —— 多模型切换、流式 Markdown、富文本 blocks 渲染、思考链展示、消息编辑/回收站/多选
