@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>桌面歌词</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' file:">
+<!-- 和 index.html 同一份字体：点歌台里的歌词是这套（拉丁字母 Cormorant 斜体、中文宋体），悬浮窗不能自己换成雅黑 -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* 桌面歌词独立窗：透明、无框、置顶。
+     鼠标移上来才显出边框和把手：拖中间挪位置，拖四边四角改长宽；字号跟着窗口高度走，太长的句子按宽度缩小，不折行。
+     锁上之后鼠标穿透，只剩一把小锁（悬停才出现）。
+     样式和点歌台里的 .mz-dl-l 同一套：未唱白、唱过主题色提亮，暗影保清晰、主题色辉光。 */
+  html, body { margin:0; height:100%; background:transparent; overflow:hidden; user-select:none; -webkit-user-select:none; }
+  body { font-family:'Cormorant Garamond', SimSun, '宋体', 'Songti SC', STSong, 'Noto Serif SC', serif; --accent:#c89555; --fs:40px; }
+  #wrap { position:fixed; inset:0; box-sizing:border-box; padding:8px 16px; border-radius:12px; cursor:move;
+    transition:background .18s, box-shadow .18s; }
+  body.hov:not(.locked) #wrap { background:rgba(12,12,16,.42); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent); }
+  body.locked #wrap { cursor:default; }
+  #rows { height:100%; display:flex; flex-direction:column; justify-content:center; gap:2px; }
+  .l { --hl:color-mix(in srgb,var(--accent) 62%,#fff); --fit:1; align-self:flex-start; max-width:100%; box-sizing:border-box; padding:0 4px;
+    font-size:calc(var(--fs) * var(--fit)); font-weight:700; letter-spacing:.05em; line-height:1.3; white-space:nowrap; opacity:.72;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 55%,transparent)); transition:opacity .25s; }
+  .l:nth-child(2) { align-self:flex-end; text-align:right; }
+  .l.cur { opacity:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 9px color-mix(in srgb,var(--accent) 80%,transparent)); }
+  .l.done { opacity:.6; }
+  /* 缩到 0.6 倍还放不下：裁掉、两头淡出，字跟着唱到的位置往左滚（deskly.js 的 scroll） */
+  .l.over { width:100%; overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent); }
+  .l > span { transition:transform .3s linear; }
+  .l > span { display:inline-block; color:transparent; -webkit-text-fill-color:transparent;
+    background:linear-gradient(90deg,var(--hl) var(--p,0%),rgba(255,255,255,.9) var(--p,0%)); -webkit-background-clip:text; background-clip:text; }
+  /* 副行模式（开了「音」或「译」）：只有当前这句，罗马音/翻译小一号挂在下面，整块居中。罗马音跟主句一起扫，翻译不扫 */
+  body.sub .l { align-self:center; text-align:center; }
+  .l.ro, .l.tr { font-size:calc(var(--fs) * .62 * var(--fit)); font-weight:600; letter-spacing:.03em; opacity:.92; }
+  .l.tr > span { background:rgba(255,255,255,.86); -webkit-background-clip:text; background-clip:text; }
+  /* 窗口够高时副行模式两句一页：第二句和第一句的副行之间空开一点，看得出是两组 */
+  body.sub .l.g1:not(.ro):not(.tr) { margin-top:calc(var(--fs) * .18); }
+  /* 空的副行（这句恰好没翻译）照样占高度，不然整块上下跳 */
+  .l > span:empty::before { content:'\00a0'; }
+  #bar button.opt { width:24px; font:600 12px/1 'Microsoft YaHei', sans-serif; opacity:.6; }
+  #bar button.opt.on { opacity:1; color:var(--accent); border-color:var(--accent); }
+  #bar button.opt[hidden] { display:none; }
+
+  /* 工具条：右上角，悬停才出现 */
+  #bar { position:absolute; top:6px; right:8px; display:flex; gap:5px; opacity:0; pointer-events:none; transition:opacity .18s; z-index:3; }
+  body.hov #bar { opacity:1; pointer-events:auto; }
+  body.locked #bar button:not(#bl) { display:none; }
+  #bar button { width:26px; height:24px; padding:0; display:grid; place-items:center; border:1px solid rgba(255,255,255,.3); border-radius:6px; cursor:pointer;
+    background:rgba(18,18,22,.82); color:#eee; }
+  #bar button:hover { border-color:var(--accent); color:var(--accent); }
+  #bar svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* 改大小的把手：四边 + 四角。锁着时没有 */
+  .h { position:absolute; z-index:2; display:none; }
+  body.hov:not(.locked) .h { display:block; }
+  .h.n, .h.s { left:14px; right:14px; height:7px; cursor:ns-resize; }
+  .h.e, .h.w { top:14px; bottom:14px; width:7px; cursor:ew-resize; }
+  .h.n { top:0; } .h.s { bottom:0; } .h.e { right:0; } .h.w { left:0; }
+  .h.nw, .h.ne, .h.sw, .h.se { width:16px; height:16px; }
+  .h.nw { left:0; top:0; cursor:nwse-resize; } .h.se { right:0; bottom:0; cursor:nwse-resize; }
+  .h.ne { right:0; top:0; cursor:nesw-resize; } .h.sw { left:0; bottom:0; cursor:nesw-resize; }
+  /* 右下角画个三道斜线，一看就知道能拉 */
+  .h.se::after { content:''; position:absolute; right:3px; bottom:3px; width:10px; height:10px;
+    background:linear-gradient(135deg,transparent 0 45%,var(--accent) 45% 52%,transparent 52% 62%,var(--accent) 62% 69%,transparent 69% 79%,var(--accent) 79% 86%,transparent 86%); opacity:.85; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="rows"></div>
+</div>
+<div id="bar">
+  <button id="bro" class="opt" hidden title="罗马音">音</button>
+  <button id="btr" class="opt" hidden title="翻译">译</button>
+  <button id="bl" title="锁定（鼠标穿透，点得到下面的东西）"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path id="blp" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+  <button id="bx" title="关闭桌面歌词"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+<div class="h n" data-d="n"></div><div class="h s" data-d="s"></div><div class="h e" data-d="e"></div><div class="h w" data-d="w"></div>
+<div class="h nw" data-d="nw"></div><div class="h ne" data-d="ne"></div><div class="h sw" data-d="sw"></div><div class="h se" data-d="se"></div>
+<script src="deskly.js"></script>
+</body>
+</html>

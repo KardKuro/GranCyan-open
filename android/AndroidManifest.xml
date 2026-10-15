@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.grancyan.app"
+    android:versionCode="8"
+    android:versionName="2.6.1">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 读 Gadgetbridge 导出的 /storage/emulated/0/手环数据/Gadgetbridge.db。
+         那不是本应用的私有目录，Android 11+ 分区存储下普通读权限够不着，
+         必须要「所有文件访问权限」，而且只能由用户在系统设置里手动打开
+         （BandBridge.requestAccess() 负责把他送过去）。 -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <!-- 拍照：网页里走 getUserMedia 取摄像头，WebView 的 onPermissionRequest 会转成这条系统权限 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <!-- 语音消息 / AI 语音通话：网页 getUserMedia 要麦克风。少了这条，系统设置里连麦克风开关都不会出现，
+         WebView 就算把权限 grant 给网页，录音也会在系统那层被拒 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+    <!-- 网页坞里的页面借 App 的震动：navigator.vibrate 在 WebView 里没这条就是静默无效
+         （不报错、不抛异常，纯粹什么都不发生） -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <!-- ACCESS_FINE_LOCATION：藏宝地图要精确位置 + 接近提醒（addProximityAlert 只认 FINE）；
+         手机近况（PhoneBridge）也用它。 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <!-- 藏宝地图（TreasureBridge / js/68-treasure.js）：走近 AI 埋纸条的地方时系统通知。
+         BACKGROUND_LOCATION：App 不在前台时接近提醒也得响；11+ 只能在系统设置页里选「始终允许」，弹不出框。
+         POST_NOTIFICATIONS：13+ 的运行时权限，少了通知静默不出（不报错）。
+         RECEIVE_BOOT_COMPLETED：重启后系统把接近提醒全清了，开机要从 SharedPreferences 重挂。 -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <!-- 点歌（MusicService）：下拉栏/锁屏的播放卡片是 mediaPlayback 前台服务的通知；
+         Android 14 起前台服务必须声明类型，并且要有对应类型的那条权限，少了 startForeground 直接抛。
+         SYSTEM_ALERT_WINDOW = 「在其他应用上层显示」，桌面歌词悬浮条要它，只能她在系统设置里手动打开。 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <!-- 锁屏后放歌：两首之间取地址/缓冲别让 CPU 睡过去（MusicService 只在放着时拿） -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <!-- 手机近况（PhoneBridge / js/60-phone.js），两样都默认关，设置里打开了才去要：
+         PACKAGE_USAGE_STATS 是「特殊权限」，声明了也不会弹框，只能她去「使用情况访问」里手动开；
+         少了这条声明，那个设置页的列表里压根不会出现 Grancyan。
+         ACCESS_COARSE_LOCATION 只要粗略位置（~2km），判断在哪个城市 / 区就够了。 -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <!-- Android 11+ 包可见性：不声明的话 getApplicationInfo 对别的 App 一律 NameNotFound，
+         使用时长只能列一串包名（com.ss.android.ugc.aweme）而不是「抖音」。
+         有桌面图标的 App 就够了；HOME 那条是为了认出桌面本身，好把它排除掉。 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.HOME"/>
+        </intent>
+    </queries>
+
+    <application
+        android:label="Grancyan"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+        android:allowBackup="true">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|uiMode|density"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- 支持从文件管理器打开 EPUB -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:scheme="content"/>
+                <data android:mimeType="application/epub+zip"/>
+                <data android:host="*"/>
+                <data android:pathPattern=".*\\.epub"/>
+            </intent-filter>
+        </activity>
+        <service
+            android:name=".MusicService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
+        <!-- 接近提醒的 PendingIntent 打到这里。exported=false：只有经由自家 PendingIntent 才进得来 -->
+        <receiver
+            android:name=".TreasureAlertReceiver"
+            android:exported="false"/>
+        <!-- 开机 / 覆盖安装后重挂接近提醒。两个都是受保护广播，别的 App 伪造不了 -->
+        <receiver
+            android:name=".TreasureBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

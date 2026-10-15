@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 藏宝纸条的通知栏小图标：一个小礼物盒（盒盖 + 盒身 + 中间一道丝带缝 + 顶上蝴蝶结）。
+     系统只取 alpha 当剪影，所以单色、靠镂空的缝分出结构 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- 蝴蝶结：两个圈 -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,8C10.2,4.3 6.6,4.4 7,6.6C7.3,7.7 9.4,8 12,8z"/>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,8C13.8,4.3 17.4,4.4 17,6.6C16.7,7.7 14.6,8 12,8z"/>
+    <!-- 盒盖（左右两半，中间留丝带缝） -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M3,8.6h8v3.4H3z M13,8.6h8v3.4h-8z"/>
+    <!-- 盒身 -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M4.5,13H11v8H4.5z M13,13h6.5v8H13z"/>
+</vector>

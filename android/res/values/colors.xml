@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用图标原图的底色（Grancyan应用图标.png 四角取样 14,71,143） -->
+    <color name="ic_launcher_bg">#0E478F</color>
+</resources>

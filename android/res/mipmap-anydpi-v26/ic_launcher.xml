@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 自适应图标（问题：桌面上的图标「没法显示全」）。
+     以前只有 mipmap-*/ic_launcher.png 一张方图，Android 8+ 的启动器把它当老式图标，缩小后塞进白圆里。
+     现在给前景+背景两层：前景是原图缩到 70% 放在 108dp 画布正中（图标那串符号落在圆形遮罩的安全区内），
+     背景是原图同一个蓝，系统用什么形状裁都是满的。老系统（7.x 及以下）仍走 mipmap-*/ic_launcher.png。 -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_bg"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+</adaptive-icon>

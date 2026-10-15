@@ -1,0 +1,392 @@
+/* ═══════════════════════════════════════════════════════════════════
+   墨块 / 米纸 色温 + 「色块」界面形状
+   参考：用户发的那条 Haiku 5.5 宣传片（米白纸、墨黑块、电光蓝块，
+   直角便当格、等宽大写小标签、超宽粗黑体、虚线弧、一排排进度小方块）。
+
+   这个文件分两段，各管各的，测试会反过来验每条规则都挂在自己的根选择器下：
+     · html.theme-light —— 浅色配色（米纸）的补丁。主界面有一批底色是写死的深色
+       rgba，浅底上会变成一块块黑补丁，这里把它们翻成变量。跟形状无关，柔和形状
+       配米纸也靠这段。
+     · html.ui-block    —— 色块形状本身。
+   没开这两样的时候这里一条都不生效，界面和以前逐字节一样。
+
+   动态强调色（js/02-state.js 的 applyAccentCSS）往 <style> 里写了一批 !important，
+   要盖它就得 !important + 更高的特异性，下面凡是带 !important 的都是在跟它较劲。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 字体打进本地：项目规矩是库一律走本地，手机上可能没代理。都只带拉丁子集，
+   中文落到系统黑体（Windows 微软雅黑 / 安卓 Noto Sans CJK）。浏览器只在规则
+   真用到时才下载，没开色块形状时这两个文件不会被请求。 */
+@font-face {
+  font-family:'GC Archivo';font-style:normal;font-weight:100 900;font-stretch:62% 125%;font-display:swap;
+  src:url(./fonts/archivo-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family:'GC Mono';font-style:normal;font-weight:400 700;font-display:swap;
+  src:url(./fonts/jetbrains-mono-latin.woff2) format('woff2');
+}
+
+/* 外观面板里的小样：不依赖当前形状，所以放在两段外面（只是两个色块，无副作用） */
+.swatch-ink { background:linear-gradient(135deg,#161616 48%,#3640f2 50%); }
+.swatch-paper { background:linear-gradient(135deg,#efece5 48%,#2f3be6 50%); }
+.shape-block { border-radius:0;background:
+  linear-gradient(#2f3be6,#2f3be6) 0 0/50% 50% no-repeat,
+  linear-gradient(#111,#111) 100% 100%/50% 50% no-repeat,
+  #e3ddd2; }
+
+/* ── 浅色补丁（米纸） ──────────────────────────────────────────────── */
+/* foundation 的公共 token 在浅底上的取值（:root 里是深色版；--bg-rgb / --on-accent 由 JS 写） */
+html.theme-light {
+  --bg-input:rgba(17,17,17,.04);--scrim:rgba(60,55,45,.35);
+  --shadow-pop:0 8px 28px rgba(60,52,40,.18);--shadow-panel:0 32px 80px rgba(40,30,10,.25);
+  --focus-ring-color:rgba(var(--accent-rgb),.85);
+}
+html.theme-light body { background:var(--bg-base); }
+html.theme-light ::-webkit-scrollbar-thumb { background:rgba(17,17,17,.22); }
+html.theme-light input[type="checkbox"] { background:rgba(17,17,17,.04) !important;border-color:rgba(17,17,17,.28) !important; }
+html.theme-light input[type="checkbox"]:hover { background:rgba(17,17,17,.08) !important;border-color:rgba(17,17,17,.45) !important; }
+/* 生命体征的监护屏在米纸上也留黑（gen-light-patch 跳过了它），里面吃的文字/边框变量换回深色那套 */
+html.theme-light .vitals-card { background-color:#141210;color-scheme:dark;--text-primary:#eee8df;--text-secondary:#c1b7ab;--text-dim:#aaa096;--text-muted:#91877d;--border:rgba(255,255,255,0.07);box-shadow:0 12px 30px rgba(60,52,40,.28); }
+/* 屏幕外面的开关：薄荷绿在米色上发虚，压深一档；打开的拨杆要比上面那条全局 checkbox 更具体才亮得起来 */
+html.theme-light .vitals-switches .vitals-toggle-row:has(input:checked)::after { color:#0d7a55;border-color:rgba(13,122,85,.4);box-shadow:none; }
+html.theme-light .vitals-toggle-row input[type="checkbox"]:checked { background:rgba(var(--accent-rgb,99,102,241),.75) !important; }
+html.theme-light #sidebar { background:rgba(var(--bg-rgb),.94);border-right-color:var(--border); }
+html.theme-light .sidebar-top { background:none; }
+html.theme-light .sidebar-footer { background:none; }
+html.theme-light header { background:rgba(var(--bg-rgb),.94);border-bottom-color:var(--border);box-shadow:none; }
+html.theme-light .bubble.ai { background:var(--bg-surface);border-color:var(--border); }
+html.theme-light #chatWindow.gc-mode-solo .msg-group.ai .bubble.ai { background:transparent; }
+html.theme-light .bubble.user { color:var(--text-primary); }
+html.theme-light .msg-token-info { color:var(--text-muted); }
+html.theme-light .msg-action-btn { background:rgba(17,17,17,.03); }
+html.theme-light .input-bar-wrap { --ib-rgb:var(--bg-rgb);background:linear-gradient(to bottom,transparent calc(var(--ib-pt) - 2px),rgba(var(--bg-rgb),.97) calc(var(--ib-pt) - 2px)); }
+html.theme-light .input-bar { background:rgba(255,255,255,.55);border-color:var(--border-mid); }
+html.theme-light .input-bar:focus-within { box-shadow:0 0 0 3px var(--accent-soft); }
+html.theme-light .user-thinking-block { border-bottom-color:rgba(17,17,17,.18); }
+html.theme-light .user-thinking-body { color:var(--text-dim);background:rgba(17,17,17,.04);border-left-color:rgba(17,17,17,.2); }
+html.theme-light .thinking-inline-body { color:var(--text-dim); }
+html.theme-light .think-body { color:var(--text-dim);background:rgba(17,17,17,.04); }
+html.theme-light .think-block.done .think-toggle { border-color:var(--border-mid); }
+html.theme-light .settings-panel { background:rgba(var(--bg-rgb),.97);border-color:var(--border-mid);box-shadow:0 32px 80px rgba(40,30,10,.25); }
+html.theme-light #settingsModal { background:rgba(60,55,45,.35); }
+html.theme-light .color-dot.selected { border-color:#111; }
+html.theme-light .appearance-choice-swatch { border-color:rgba(17,17,17,.15); }
+html.theme-light .bubble.ai a[href^="http"]:not([class]) { background:#111;color:#efece5;border-color:#111;box-shadow:none; }
+html.theme-light select,
+html.theme-light input[type="text"],
+html.theme-light input[type="number"],
+html.theme-light input[type="password"],
+html.theme-light textarea { color-scheme:light; }
+
+/* ── 界面形状：色块 ────────────────────────────────────────────────── */
+/* 骨架：所有走 --radius-* 的圆角一次归零，再定义三套字 */
+html.ui-block {
+  --radius-sm:0px;--radius-md:0px;--radius-lg:0px;--radius-xl:0px;
+  --blk-wide:'GC Archivo','Arial Black','Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif;
+  --blk-sans:'GC Archivo','Microsoft YaHei','PingFang SC','Noto Sans SC',system-ui,sans-serif;
+  --blk-mono:'GC Mono',ui-monospace,Consolas,'Microsoft YaHei',monospace;
+  /* 墨块的字色和块色互为反色：在电光蓝/墨黑块上写字一律用这个 */
+  --blk-on-accent:#ffffff;
+  --blk-ink:#111111;--blk-cream:#efece5;
+}
+/* 背景那道虚线弧，原片每一帧都有。钉在遮罩层上，内容永远压在它上面 */
+html.ui-block #bg-mask::after {
+  content:'';position:fixed;left:-10vw;right:-10vw;top:52vh;height:90vh;pointer-events:none;
+  border-top:1.5px dashed var(--text-muted);border-radius:50% 50% 0 0 / 100% 100% 0 0;opacity:.35;
+}
+
+/* 侧栏：一整块实底，不要毛玻璃 */
+html.ui-block #sidebar { background:var(--bg-surface);backdrop-filter:none;-webkit-backdrop-filter:none;border-right:none; }
+html.ui-block .sidebar-top { background:none;padding:18px 12px 12px; }
+/* 花体 logo 换成超宽粗体字标 + 一行等宽小字，原片片头那种 */
+/* logo 的 img 自带内联 display:block，只能 !important 盖 */
+html.ui-block .sidebar-top > img { display:none !important; }
+html.ui-block .sidebar-top::before {
+  content:'GRANCYAN';display:block;margin:0 2px 4px;
+  font-family:var(--blk-wide);font-stretch:125%;font-weight:900;font-size:25px;line-height:1;letter-spacing:-.01em;
+  color:var(--text-primary);
+}
+html.ui-block .sidebar-top::after {
+  content:'AI 小窝 · MOTION REEL';display:block;margin:0 2px 14px;
+  font-family:var(--blk-mono);font-size:9.5px;letter-spacing:.16em;color:var(--text-muted);
+}
+/* ::after 天生排在最后；改成 flex 列、子项一律 order:1，它就跟着 ::before 跑到按钮上面去了 */
+html.ui-block .sidebar-top { display:flex;flex-direction:column; }
+html.ui-block .sidebar-top > * { order:1; }
+/* 三颗大按钮 = 三块不同颜色的块：蓝 / 米 / 墨 */
+html.ui-block .new-chat-btn {
+  border:none;border-radius:0;background:var(--bg-elevated);color:var(--text-primary);
+  font-family:var(--blk-sans);font-weight:700;font-size:14px;letter-spacing:.02em;padding:12px 14px;margin-bottom:6px;
+  box-shadow:none;transition:background .12s,color .12s,transform .12s;
+}
+html.ui-block .new-chat-btn:hover { background:var(--bg-hover);box-shadow:none;transform:translateX(2px); }
+html.ui-block .new-chat-btn .icon { border-radius:0;background:transparent;color:inherit;font-family:var(--blk-mono); }
+html.ui-block .sidebar-top > .new-chat-btn:first-of-type { background:var(--accent);color:var(--blk-on-accent); }
+html.ui-block .sidebar-top > .new-chat-btn:first-of-type:hover { filter:brightness(1.08); }
+html.ui-block .study-entry-badge { border-radius:0;background:var(--accent);color:var(--blk-on-accent);font-family:var(--blk-mono); }
+html.ui-block .study-head-badge { border-radius:0;color:var(--blk-on-accent);font-family:var(--blk-mono); }
+html.ui-block .search-wrap { margin-top:6px; }
+html.ui-block #chatSearch { border-radius:0;border:1px solid var(--border-mid);background:transparent;font-family:var(--blk-mono);font-size:11px;letter-spacing:.04em; }
+html.ui-block #chatSearch:focus { border-color:var(--text-primary); }
+
+/* 对话列表：等宽编号 + 当前项整块电光蓝 */
+html.ui-block #chatList { counter-reset:blk-chat; }
+html.ui-block .chat-section-label {
+  font-family:var(--blk-mono);font-size:9.5px;letter-spacing:.18em;opacity:1;color:var(--text-muted);
+  display:flex;align-items:center;gap:7px;
+}
+html.ui-block .chat-section-label::before { content:'';width:7px;height:7px;background:var(--accent);flex:none; }
+html.ui-block .chat-item { border-radius:0;margin-bottom:3px;gap:8px; }
+html.ui-block .chat-item::before {
+  counter-increment:blk-chat;content:counter(blk-chat,decimal-leading-zero);flex:none;width:18px;
+  font-family:var(--blk-mono);font-size:10px;color:var(--text-muted);
+}
+html.ui-block .chat-item:hover { background:var(--bg-elevated); }
+html.ui-block .chat-item.active { background:var(--accent) !important;border-left:none;padding-left:10px; }
+html.ui-block .chat-item.active::before,
+html.ui-block .chat-item.active .chat-item-title,
+html.ui-block .chat-item.active .chat-item-meta,
+html.ui-block .chat-item.active .chat-item-time { color:var(--blk-on-accent); }
+html.ui-block .chat-item-title { font-family:var(--blk-sans);font-weight:600;font-size:13.5px; }
+html.ui-block .chat-item-time,
+html.ui-block .chat-item-meta { font-family:var(--blk-mono);font-size:10px;letter-spacing:.02em; }
+html.ui-block .token-badge { border-radius:0;background:transparent;border-color:currentColor;opacity:.75; }
+html.ui-block .chat-item-actions button { border-radius:0; }
+html.ui-block .sidebar-footer { background:none;border-top:1px solid var(--border); }
+html.ui-block .footer-user-row,
+html.ui-block .footer-gear,
+html.ui-block .footer-btn { border-radius:0; }
+html.ui-block .footer-avatar { border-radius:0; }
+html.ui-block .footer-user-name { font-family:var(--blk-mono);font-size:11px;letter-spacing:.06em; }
+
+/* 顶栏：实底，标题用宽体，按钮方掉 */
+html.ui-block header { background:var(--bg-base);box-shadow:none;border-bottom:1px solid var(--border); }
+html.ui-block #currentChatTitle { font-family:var(--blk-wide);font-stretch:118%;font-weight:800;font-size:15px;letter-spacing:.005em;max-width:320px; }
+html.ui-block .menu-btn { border-radius:0; }
+html.ui-block .model-pill { border-radius:0;font-family:var(--blk-mono);font-size:11px;letter-spacing:.06em;box-shadow:none; }
+html.ui-block .model-pill .pill-dot { border-radius:0; }
+html.ui-block .model-pill.active { background:var(--accent) !important;color:var(--blk-on-accent) !important;border-color:var(--accent) !important; }
+html.ui-block #modelDropdownWrap > button { border-radius:0 !important;font-family:var(--blk-mono);letter-spacing:.04em;box-shadow:none !important; }
+
+/* 消息：发言人一行等宽大写，圆点换小方块 */
+html.ui-block .msg-label { font-family:var(--blk-mono);font-weight:500;font-size:10.5px;letter-spacing:.18em; }
+html.ui-block .msg-label-dot { border-radius:0;width:8px;height:8px; }
+/* AI 的话 = 一整块实底（原片里的米色/墨色块），没有描边没有毛玻璃 */
+html.ui-block .bubble.ai,
+html.ui-block #chatWindow.gc-mode-solo .msg-group.ai .bubble.ai {
+  background:var(--bg-surface);border:none;border-left:none !important;border-radius:0;
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;padding:16px 20px;
+}
+html.ui-block #chatWindow.gc-mode-solo .msg-group.ai .bubble.ai.bubble-sticker,
+html.ui-block .bubble.ai.bubble-sticker { background:none;padding:0; }
+/* 她的话 = 电光蓝实心块，白字。这是整套里最抢眼的那一手 */
+html.ui-block .bubble.user {
+  background:var(--accent) !important;border:none !important;border-radius:0;color:var(--blk-on-accent);
+  backdrop-filter:none;-webkit-backdrop-filter:none;padding:14px 18px;
+  box-shadow:none !important;   /* 渲染时写了内联的强调色光晕（06-render-msg.js），平面块不要光 */
+}
+html.ui-block .bubble.user strong { color:var(--blk-on-accent); }
+html.ui-block .bubble.user code { border-color:rgba(255,255,255,.3);background:rgba(0,0,0,.18);border-radius:0;font-family:var(--blk-mono); }
+html.ui-block .bubble.user .user-thinking-block { border-bottom-color:rgba(255,255,255,.35);color:rgba(255,255,255,.85); }
+html.ui-block .bubble.user .user-thinking-block summary { color:rgba(255,255,255,.8); }
+html.ui-block .bubble.user .user-thinking-body { color:rgba(255,255,255,.88);background:rgba(0,0,0,.14);border-left-color:rgba(255,255,255,.4);border-radius:0; }
+/* 正文里的结构件：标题走宽体、行内代码是墨块、列表点是小方块、引用是蓝竖条 */
+html.ui-block .bubble.ai h1,
+html.ui-block .bubble.ai h2,
+html.ui-block .bubble.ai h3 {
+  font-family:var(--blk-wide);font-stretch:118%;font-style:normal;font-weight:800;letter-spacing:-.005em;
+  color:var(--text-primary);border-bottom:none;
+}
+html.ui-block .bubble.ai h1 { font-size:1.55em;line-height:1.15;color:var(--text-primary); }
+html.ui-block .bubble.ai h2 { font-size:1.3em; }
+html.ui-block .bubble.ai h3 { font-size:1.1em; }
+html.ui-block .bubble.ai h4 { font-family:var(--blk-mono);font-size:.8em;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted); }
+html.ui-block .bubble.ai :not(pre) > code {
+  font-family:var(--blk-mono);font-size:.82em;font-weight:500;padding:.12em .45em;border-radius:0;border:none;
+  background:var(--text-primary);color:var(--bg-base);
+}
+html.ui-block .bubble.ai ul { list-style:none;margin-left:.2em; }
+html.ui-block .bubble.ai ul > li { position:relative;padding-left:1.15em; }
+html.ui-block .bubble.ai ul > li::before { content:'';position:absolute;left:0;top:.62em;width:.42em;height:.42em;background:var(--accent); }
+/* 有序列表：底层 tailwind 把序号清掉了，这里补成原片那种 01 / 02 / 03 等宽编号 */
+html.ui-block .bubble.ai ol { list-style:none;margin-left:.2em;counter-reset:blk-ol; }
+html.ui-block .bubble.ai ol > li { position:relative;padding-left:2em; }
+html.ui-block .bubble.ai ol > li::before {
+  counter-increment:blk-ol;content:counter(blk-ol,decimal-leading-zero);position:absolute;left:0;top:.2em;
+  font-family:var(--blk-mono);font-size:.74em;font-weight:500;color:var(--accent);letter-spacing:.04em;
+}
+html.ui-block .bubble.ai blockquote { border-left:4px solid var(--accent);border-radius:0;background:var(--bg-elevated);padding:.6em .9em; }
+html.ui-block .bubble.ai hr { border:none;border-top:1.5px dashed var(--text-muted);opacity:.5; }
+html.ui-block .bubble.ai pre,
+html.ui-block .bubble.ai pre code { border-radius:0; }
+html.ui-block .bubble.ai a[href^="http"]:not([class]) { border-radius:0;background:var(--text-primary);color:var(--bg-base);border:none;box-shadow:none;font-family:var(--blk-mono);font-size:.72em; }
+html.ui-block .bubble table th { font-family:var(--blk-mono);font-size:.78em;letter-spacing:.08em;text-transform:uppercase; }
+/* 思考过程：方的，等宽小标签 */
+html.ui-block .think-toggle { border-radius:0;border:none;background:var(--bg-elevated);font-family:var(--blk-mono);font-size:10.5px;letter-spacing:.1em;padding:5px 11px; }
+html.ui-block .think-block.done .think-toggle { border:none; }
+html.ui-block .think-block.done .think-toggle .think-label { color:var(--text-dim);opacity:1; }
+html.ui-block .think-block.open .think-toggle { background:var(--text-primary);color:var(--bg-base); }
+html.ui-block .think-block.open .think-toggle .think-label { color:var(--bg-base); }
+html.ui-block .think-body { border-radius:0;border-left:4px solid var(--accent);background:var(--bg-elevated); }
+html.ui-block .thinking-inline { border-radius:0;background:var(--bg-elevated);border:none; }
+html.ui-block .thinking-inline-header { font-family:var(--blk-mono);font-size:10.5px;letter-spacing:.12em; }
+html.ui-block .thinking-inline-body { border-top-color:var(--border); }
+html.ui-block .bubble.ai .think-body { background:var(--bg-elevated); }
+/* 消息下面那排小按钮：等宽，方框，悬停反成墨块 */
+html.ui-block .msg-action-btn {
+  border-radius:0;background:transparent;border:1px solid var(--border-mid);box-shadow:none;
+  font-family:var(--blk-mono);font-size:10.5px;letter-spacing:.06em;padding:3px 9px;
+}
+html.ui-block .msg-action-btn:hover { background:var(--text-primary);color:var(--bg-base);border-color:var(--text-primary);box-shadow:none; }
+html.ui-block .msg-token-info { font-family:var(--blk-mono);font-size:10.5px;letter-spacing:.04em;color:var(--text-muted); }
+
+/* 输入栏：一整块，发送键是墨块（原片里那个 SEND） */
+html.ui-block .input-bar-wrap { --ib-rgb:var(--bg-rgb);background:linear-gradient(to bottom,transparent calc(var(--ib-pt) - 2px),rgb(var(--bg-rgb)) calc(var(--ib-pt) - 2px)); }
+html.ui-block .input-bar {
+  border-radius:0;background:var(--bg-surface);border:1.5px solid var(--bg-surface);
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;
+}
+html.ui-block .composer-tray:has(> :not([style*="none"])) {
+  border-radius:0;background:var(--bg-surface);border:1.5px solid var(--bg-surface);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+html.ui-block .composer-tray > .quote-preview-bar { border-radius:0; }
+html.ui-block .input-bar:focus-within { border-color:var(--text-primary);box-shadow:none; }
+html.ui-block .input-bar button { border-radius:0 !important; }
+html.ui-block .input-bar.has-content .plus-btn { background:var(--text-primary) !important;border-color:var(--text-primary) !important;color:var(--bg-base) !important; }
+html.ui-block .expand-send-btn { background:var(--text-primary) !important;color:var(--bg-base) !important;border-radius:0 !important; }
+html.ui-block #userInput::placeholder { font-family:var(--blk-mono);font-size:12.5px;letter-spacing:.04em; }
+html.ui-block .user-thinking-input,
+html.ui-block .composer-text-stack input::placeholder { font-family:var(--blk-mono);letter-spacing:.03em; }
+
+/* 设置面板：原片的版式 —— 宽体大标题、等宽编号小标签、选中项整块反色 */
+html.ui-block .settings-panel {
+  border-radius:0;border:none;background:var(--bg-base);backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:0 0 0 1px var(--border-mid),0 30px 80px rgba(0,0,0,.45);
+}
+html.ui-block .settings-header { padding:26px 28px 0;align-items:flex-start; }
+html.ui-block .settings-header h2 {
+  font-family:var(--blk-wide);font-stretch:125%;font-weight:900;font-size:24px;line-height:1.05;letter-spacing:-.01em;text-shadow:none;
+}
+html.ui-block .settings-header h2::after {
+  content:'SETTINGS · VERSE 01 / 04';display:block;margin-top:8px;
+  font-family:var(--blk-mono);font-size:9.5px;font-weight:400;letter-spacing:.18em;color:var(--text-muted);
+}
+html.ui-block .settings-close { border-radius:0;border:none;background:var(--text-primary);color:var(--bg-base); }
+html.ui-block .settings-close:hover { background:var(--accent);color:var(--blk-on-accent); }
+html.ui-block .settings-tabs { gap:4px;border-bottom:none;padding-top:18px; }
+html.ui-block .stab {
+  font-family:var(--blk-mono);font-size:11px;font-weight:500;letter-spacing:.08em;
+  border-bottom:none;background:var(--bg-surface);color:var(--text-dim);padding:8px 12px;
+}
+html.ui-block .stab:hover:not(.active) { background:var(--bg-elevated);color:var(--text-primary); }
+html.ui-block .stab.active { background:var(--accent);color:var(--blk-on-accent);text-shadow:none; }
+html.ui-block .stab-content { counter-reset:blk-sec; }
+html.ui-block .section-label {
+  font-family:var(--blk-mono);font-weight:500;font-size:10.5px;letter-spacing:.18em;color:var(--text-primary) !important;
+}
+html.ui-block .settings-section > .section-label:first-child::before {
+  counter-increment:blk-sec;content:counter(blk-sec,decimal-leading-zero) '  ';color:var(--accent);
+}
+html.ui-block .appearance-preset-label { font-family:var(--blk-mono);font-size:10px;letter-spacing:.14em;color:var(--text-muted); }
+html.ui-block .appearance-choice {
+  border-radius:0;border:none;background:var(--bg-surface);box-shadow:none;transform:none;
+}
+html.ui-block .appearance-choice:hover { background:var(--bg-elevated);transform:none; }
+html.ui-block .appearance-choice.active { background:var(--accent);color:var(--blk-on-accent);box-shadow:none; }
+html.ui-block .appearance-choice.active small { color:rgba(255,255,255,.78); }
+html.ui-block .appearance-choice b { font-family:var(--blk-sans);font-weight:700; }
+html.ui-block .appearance-choice small { font-family:var(--blk-mono);font-size:9.5px;letter-spacing:.02em; }
+html.ui-block .appearance-choice-swatch { border-radius:0;box-shadow:none; }
+html.ui-block .appearance-choice.active .appearance-choice-swatch { border-color:rgba(255,255,255,.6); }
+/* 字体预设那三颗得留着各自的宋体，否则看不出区别 */
+html.ui-block .appearance-choice.font-simsun b { font-family:SimSun,'宋体','Songti SC',serif; }
+html.ui-block .appearance-choice.font-stsong b { font-family:STSong,'华文宋体','Songti SC','Noto Serif SC',serif; }
+html.ui-block .appearance-choice.font-noto b { font-family:'Noto Serif SC','Source Han Serif SC','Songti SC',serif; }
+/* 强调色、勾选框、滑杆：圆的都改方，滑杆变成原片底部那排进度小方块 */
+html.ui-block .color-dot { border-radius:0; }
+html.ui-block .color-dot:hover { transform:none;outline:1.5px solid var(--text-muted);outline-offset:2px; }
+html.ui-block .color-dot.selected { border-color:var(--text-primary);outline:1.5px solid var(--text-primary);outline-offset:2px; }
+html.ui-block input[type="checkbox"] { border-radius:0;box-shadow:none !important; }
+html.ui-block input[type="checkbox"]:checked { background:var(--accent) !important;border-color:var(--accent) !important; }
+html.ui-block input[type="checkbox"]:checked::after { border-color:var(--blk-on-accent); }
+html.ui-block input[type=range] {
+  -webkit-appearance:none;appearance:none;height:10px;border-radius:0;background:
+    repeating-linear-gradient(90deg,transparent 0 1.5px,var(--bg-base) 1.5px 3px) ,
+    repeating-linear-gradient(90deg,var(--bg-elevated) 0 10px,transparent 10px 13px);
+}
+html.ui-block input[type=range]::-webkit-slider-thumb { border-radius:0;width:10px;height:18px;box-shadow:none;border:none; }
+html.ui-block input[type=range]::-moz-range-thumb { border-radius:0;width:10px;height:18px;border:none; }
+html.ui-block select,
+html.ui-block .settings-panel input[type="text"],
+html.ui-block .settings-panel input[type="number"],
+html.ui-block .settings-panel input[type="password"],
+html.ui-block .settings-panel textarea { border-radius:0 !important; }
+
+/* 通用直角：原片里一个圆角都没有。但不能 * 一刀切 —— 日记房间的窗、蜡烛、骰子点数、
+   唱片这些小插画全靠 50% 画圆，切了就毁了。所以只按「容器类」的类名去圆角：
+   插画元素的类名都是物件名（disc/candle/window/star…），碰不到这张表。
+   头像、圆点、滑块拇指、环形计时这几样就是该圆的，显式排除。 */
+html.ui-block :is(button, select, textarea,
+  input:not([type=range]):not([type=checkbox]):not([type=radio]),
+  [class*="panel"], [class*="card"], [class*="btn"], [class*="chip"], [class*="pill"], [class*="tab"],
+  [class*="item"], [class*="shell"], [class*="modal"], [class*="box"], [class*="badge"], [class*="tag"],
+  [class*="toast"], [class*="menu"], [class*="popup"], [class*="dialog"], [class*="sheet"], [class*="field"],
+  [class*="bubble"], [class*="block"], [class*="section"], [class*="close"], [class*="back"])
+  :not([class*="avatar"]):not([class*="dot"]):not([class*="disc"]):not([class*="ring"]):not([class*="knob"]):not([class*="thumb"]) {
+  border-radius:0 !important;
+}
+
+/* 大集合（齿轮打开的全屏面板）：左栏当前项整块电光蓝 */
+html.ui-block .hub-shell { border:none;box-shadow:0 0 0 1px var(--border-mid),0 30px 80px rgba(0,0,0,.45);backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg-base); }
+html.ui-block .hub-nav { background:var(--bg-surface);border-right:none; }
+html.ui-block .hub-nav-title { font-family:var(--blk-mono);font-weight:500;letter-spacing:.16em; }
+html.ui-block .hub-nav-btn { font-family:var(--blk-sans);font-weight:600; }
+html.ui-block .hub-nav-btn.active { background:var(--accent);color:var(--blk-on-accent); }
+html.ui-block .hub-badge { font-family:var(--blk-mono);background:var(--text-primary);color:var(--bg-base); }
+html.ui-block .hub-nav-btn.active .hub-badge { background:var(--blk-on-accent);color:var(--accent); }
+html.ui-block .hub-close { font-family:var(--blk-mono);font-weight:500;letter-spacing:.1em;border:none;background:var(--text-primary);color:var(--bg-base); }
+html.ui-block .hub-close:hover { background:var(--accent);color:var(--blk-on-accent); }
+/* 手机端功能列表：两张数字卡照小组件置顶那排，一蓝一墨；列表行和图标块直角、不要渐变 */
+@media (max-width:768px), (max-height:500px) and (orientation:landscape) {
+  html.ui-block .hub-nav-title { font-family:var(--blk-wide);font-stretch:118%;font-weight:800;letter-spacing:0; }
+  html.ui-block .hub-nav-kao { font-family:var(--blk-mono);font-weight:500; }
+  html.ui-block .hub-nav-btn svg { border-radius:0;background:transparent; }
+  html.ui-block .hub-nav-sub { font-family:var(--blk-mono);font-size:10.5px;letter-spacing:.02em; }
+  html.ui-block .hub-nav-btn.hub-nav-tile { border:none;background:var(--accent);color:var(--blk-on-accent); }
+  html.ui-block .hub-nav-btn.hub-nav-tile[data-hub="fav"] { background:var(--text-primary);color:var(--bg-base); }
+  html.ui-block .hub-nav-tile :is(svg,.hub-badge,.hub-nav-label),
+  html.ui-block .hub-nav-tile::after { color:inherit;background:none; }
+  html.ui-block .hub-nav-tile .hub-badge { font-family:var(--blk-wide);font-stretch:118%;font-weight:800; }
+}
+html.ui-block .hub-widgets-panel { background:none; }
+html.ui-block .hub-widgets-title,
+html.ui-block .hub-detail-title { font-family:var(--blk-wide);font-stretch:118%;font-weight:800; }
+html.ui-block .hub-widgets-sub { font-family:var(--blk-mono);font-size:11px;letter-spacing:.04em; }
+html.ui-block .hub-widgets-grid .widget-item { background:var(--bg-surface);border:none;box-shadow:none; }
+html.ui-block .hub-widgets-grid .widget-item::after { display:none; }
+html.ui-block .hub-widgets-grid .widget-item:hover { transform:none;background:var(--bg-elevated);box-shadow:none; }
+/* 置顶的三张（生命体征/梦境/天气）= 原片里那排蓝 / 墨 / 米三色块 */
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured] { background:var(--bg-elevated) !important; }
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="ember"] { background:var(--accent) !important;color:var(--blk-on-accent); }
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="night"] { background:var(--text-primary) !important;color:var(--bg-base); }
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="ember"] :is(b,small,.widget-arrow),
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="night"] :is(b,small,.widget-arrow) { color:inherit; }
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="ember"] small,
+html.ui-block .hub-widgets-grid .widget-item[data-widget-featured="night"] small { opacity:.75; }
+html.ui-block .hub-widgets-grid .widget-icon { background:transparent;border:none; }
+html.ui-block .widget-copy b { font-family:var(--blk-sans);font-weight:700; }
+html.ui-block .widget-copy small { font-family:var(--blk-mono);font-size:10px;letter-spacing:.02em; }
+
+/* 小组件抽屉 / 通用卡片：方掉、去光晕 */
+html.ui-block .widget-item { border-radius:0 !important;box-shadow:none !important; }
+html.ui-block .widget-icon { border-radius:0 !important; }
+html.ui-block .widget-shelf-title span { font-family:var(--blk-wide);font-stretch:118%;font-weight:800; }
+html.ui-block .widget-shelf-title small { font-family:var(--blk-mono);letter-spacing:.06em; }
+html.ui-block .msg-nav-btn,
+html.ui-block #msgNavBar { border-radius:0; }
+html.ui-block .fav-chip,
+html.ui-block .fav-tag,
+html.ui-block .fav-newgroup input { border-radius:0; }
+html.ui-block .fav-chip.active { background:var(--accent);color:var(--blk-on-accent);border-color:var(--accent); }
+html.ui-block ::-webkit-scrollbar-thumb { border-radius:0; }

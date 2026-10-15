@@ -1,0 +1,45 @@
+{
+  "name": "grancyan",
+  "productName": "Grancyan",
+  "version": "2.6.1",
+  "description": "Grancyan - 多模型 AI 聊天应用",
+  "main": "electron-main.js",
+  "scripts": {
+    "test": "node scripts/run-tests.js",
+    "watch": "tailwindcss -i ./input.css -o ./output.css --watch",
+    "app": "electron .",
+    "pack:exe": "node scripts/prep-native.js && electron-packager . Grancyan --platform=win32 --arch=x64 --out=dist --overwrite --icon=grancyan.ico --ignore=\"^/dist(-new|-old|_build)?($|/)\" --ignore=\"^/build-native($|/)\" --ignore=\"^/history($|/)\" --ignore=\"^/hf-cache($|/)\" --ignore=\"^/tts-cache($|/)\" --ignore=\"^/labkit($|/)\" --ignore=\"^/android($|/)\" --ignore=\"^/__pycache__($|/)\" --ignore=\"^/_tmp($|/)\" --ignore=\"^/Gadgetbridge\\.db$\" --ignore=\"\\.apk(\\.idsig)?$\" --ignore=\"^/Grancyan.*\\.zip$\" --ignore=\"^/grancyan\\.keystore$\" --ignore=\"^/(key|cert)\\.pem$\" --ignore=\"^/\\.(mcp|pair)-token$\" --ignore=\"^/\\.env$\" --ignore=\"^/stickers-fav($|/)\" --ignore=\"^/stickers-packs($|/)\" --ignore=\"\\.log$\" --ignore=\"\\.(pdb|iobj|ipdb|obj|lib|exp)$\" --ignore=\"\\.map$\" --ignore=\"^/node_modules/better-sqlite3/(deps|src)($|/)\" --ignore=\"^/coread\\.db(-wal|-shm)?$\" --ignore=\"^/nursery-saves($|/)\" --ignore=\"^/data-backups($|/)\" --ignore=\"^/tests/out($|/)\" --ignore=\"^/tests/\\.fault-inject-bak($|/)\" --ignore=\"^/gemini-out($|/)\" --ignore=\"^/music-profiles($|/)\" && node scripts/slim-dist.js && node scripts/fix-native-abi.js",
+    "pack:exe:alt": "node scripts/prep-native.js && electron-packager . Grancyan --platform=win32 --arch=x64 --out=dist-new --overwrite --icon=grancyan.ico --ignore=\"^/dist(-new|-old|_build)?($|/)\" --ignore=\"^/build-native($|/)\" --ignore=\"^/history($|/)\" --ignore=\"^/hf-cache($|/)\" --ignore=\"^/tts-cache($|/)\" --ignore=\"^/labkit($|/)\" --ignore=\"^/android($|/)\" --ignore=\"^/__pycache__($|/)\" --ignore=\"^/_tmp($|/)\" --ignore=\"^/Gadgetbridge\\.db$\" --ignore=\"\\.apk(\\.idsig)?$\" --ignore=\"^/Grancyan.*\\.zip$\" --ignore=\"^/grancyan\\.keystore$\" --ignore=\"^/(key|cert)\\.pem$\" --ignore=\"^/\\.(mcp|pair)-token$\" --ignore=\"^/\\.env$\" --ignore=\"^/stickers-fav($|/)\" --ignore=\"^/stickers-packs($|/)\" --ignore=\"\\.log$\" --ignore=\"\\.(pdb|iobj|ipdb|obj|lib|exp)$\" --ignore=\"\\.map$\" --ignore=\"^/node_modules/better-sqlite3/(deps|src)($|/)\" --ignore=\"^/coread\\.db(-wal|-shm)?$\" --ignore=\"^/nursery-saves($|/)\" --ignore=\"^/data-backups($|/)\" --ignore=\"^/tests/out($|/)\" --ignore=\"^/tests/\\.fault-inject-bak($|/)\" --ignore=\"^/gemini-out($|/)\" --ignore=\"^/music-profiles($|/)\" && node scripts/slim-dist.js dist-new && node scripts/fix-native-abi.js dist-new",
+    "rebuild:native": "node scripts/prep-native.js"
+  },
+  "keywords": [],
+  "author": "KardKuro",
+  "license": "AGPL-3.0-or-later",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "better-sqlite3": "^12.11.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "epub2": "^3.0.2",
+    "express": "^5.2.1",
+    "msedge-tts": "^2.0.6",
+    "multer": "^2.2.0",
+    "officeparser": "^7.2.2",
+    "sql.js": "^1.14.1",
+    "word-extractor": "^1.0.4"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.0.2",
+    "electron": "^43.0.0",
+    "electron-rebuild": "^3.2.9",
+    "png-to-ico": "^3.0.1",
+    "pngjs": "^7.0.0",
+    "tailwindcss": "^4.3.1"
+  },
+  "overrides": {
+    "officeparser": {
+      "pdfjs-dist": "6.2.108"
+    }
+  }
+}

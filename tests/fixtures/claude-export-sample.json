@@ -1,0 +1,132 @@
+[
+  {
+    "uuid": "c0a1e7f2-1111-4a6b-9c1d-000000000001",
+    "name": "初见",
+    "summary": "",
+    "model": "claude-opus-4-5-20251101",
+    "created_at": "2026-01-12T14:03:11.123456Z",
+    "updated_at": "2026-01-12T15:40:02.654321Z",
+    "account": { "uuid": "acc00000-0000-4000-8000-0000000000aa" },
+    "chat_messages": [
+      {
+        "uuid": "m-0001", "parent_message_uuid": "00000000-0000-4000-8000-000000000000",
+        "text": "你好呀，我叫小明", "sender": "human",
+        "created_at": "2026-01-12T14:03:11.200000Z", "updated_at": "2026-01-12T14:03:11.200000Z",
+        "content": [ { "start_timestamp": "2026-01-12T14:03:11.200000Z", "stop_timestamp": "2026-01-12T14:03:11.200000Z", "flags": null, "type": "text", "text": "你好呀，我叫小明", "citations": [] } ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0002", "parent_message_uuid": "m-0001",
+        "text": "小明你好！", "sender": "assistant",
+        "created_at": "2026-01-12T14:03:20.000000Z", "updated_at": "2026-01-12T14:03:20.000000Z",
+        "content": [
+          { "start_timestamp": "2026-01-12T14:03:12.000000Z", "stop_timestamp": "2026-01-12T14:03:15.000000Z", "flags": null, "type": "thinking",
+            "thinking": "她第一次来，名字叫小明。别太正式。", "summaries": [ { "summary": "想着怎么打招呼" } ], "cut_off": false },
+          { "start_timestamp": "2026-01-12T14:03:15.000000Z", "stop_timestamp": "2026-01-12T14:03:20.000000Z", "flags": null, "type": "text", "text": "小明你好！", "citations": [] }
+        ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0003", "parent_message_uuid": "m-0001",
+        "text": "嗨，小明～", "sender": "assistant",
+        "created_at": "2026-01-12T14:05:00.000000Z", "updated_at": "2026-01-12T14:05:00.000000Z",
+        "content": [ { "start_timestamp": "2026-01-12T14:04:58.000000Z", "stop_timestamp": "2026-01-12T14:05:00.000000Z", "flags": null, "type": "text", "text": "嗨，小明～", "citations": [] } ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0004", "parent_message_uuid": "m-0003",
+        "text": "帮我看看这个文件，再查一下今天东京天气", "sender": "human",
+        "created_at": "2026-01-12T14:10:00.000000Z", "updated_at": "2026-01-12T14:10:00.000000Z",
+        "content": [ { "start_timestamp": "2026-01-12T14:10:00.000000Z", "stop_timestamp": "2026-01-12T14:10:00.000000Z", "flags": null, "type": "text", "text": "帮我看看这个文件，再查一下今天东京天气", "citations": [] } ],
+        "attachments": [ { "file_name": "notes.txt", "file_size": 22, "file_type": "txt", "extracted_content": "第一行\n第二行：重要的事" } ],
+        "files": [ { "file_name": "cat.png", "file_uuid": "f-img-0001" } ],
+        "files_v2": [ { "file_name": "cat.png", "file_uuid": "f-img-0001", "file_kind": "image" } ]
+      },
+      {
+        "uuid": "m-0005", "parent_message_uuid": "m-0004",
+        "text": "This block is not supported on your current device yet.\n\n东京今天晴。", "sender": "assistant",
+        "created_at": "2026-01-12T14:10:30.000000Z", "updated_at": "2026-01-12T14:10:30.000000Z",
+        "content": [
+          { "start_timestamp": "2026-01-12T14:10:01.000000Z", "stop_timestamp": "2026-01-12T14:10:02.000000Z", "flags": null, "type": "tool_use",
+            "name": "web_search", "input": { "query": "东京 天气 今天" }, "message": "Searching the web", "integration_name": null, "integration_icon_url": null, "context": null, "display_content": null, "approval_options": null, "approval_key": null },
+          { "start_timestamp": null, "stop_timestamp": null, "flags": null, "type": "tool_result", "name": "web_search",
+            "content": [ { "type": "knowledge", "title": "東京の天気", "url": "https://weather.example.jp/tokyo", "text": "很长很长的网页原文……" } ], "is_error": false, "message": null, "display_content": null },
+          { "start_timestamp": "2026-01-12T14:10:20.000000Z", "stop_timestamp": "2026-01-12T14:10:30.000000Z", "flags": null, "type": "text",
+            "text": "东京今天晴。", "citations": [ { "uuid": "cit-1", "start_index": 0, "end_index": 6, "details": { "type": "web_search_citation", "url": "https://weather.example.jp/tokyo", "title": "東京の天気" } } ] }
+        ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0006", "parent_message_uuid": "m-0005",
+        "text": "给我写个小网页", "sender": "human",
+        "created_at": "2026-01-12T15:00:00.000000Z", "updated_at": "2026-01-12T15:00:00.000000Z",
+        "content": [ { "start_timestamp": "2026-01-12T15:00:00.000000Z", "stop_timestamp": "2026-01-12T15:00:00.000000Z", "flags": null, "type": "text", "text": "给我写个小网页", "citations": [] } ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0007", "parent_message_uuid": "m-0006",
+        "text": "", "sender": "assistant",
+        "created_at": "2026-01-12T15:00:05.000000Z", "updated_at": "2026-01-12T15:00:05.000000Z",
+        "content": [],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0008", "parent_message_uuid": "m-0006",
+        "text": "写好了", "sender": "assistant",
+        "created_at": "2026-01-12T15:02:00.000000Z", "updated_at": "2026-01-12T15:02:00.000000Z",
+        "content": [
+          { "start_timestamp": "2026-01-12T15:01:00.000000Z", "stop_timestamp": "2026-01-12T15:01:30.000000Z", "flags": null, "type": "tool_use", "name": "artifacts",
+            "input": { "id": "hello-page", "type": "text/html", "title": "给小明的小网页", "command": "create", "content": "<h1>小明</h1>\n<pre>```不是围栏```</pre>", "language": "html", "version_uuid": "v-1" } },
+          { "start_timestamp": null, "stop_timestamp": null, "flags": null, "type": "tool_result", "name": "artifacts", "content": [ { "type": "text", "text": "OK", "uuid": "tr-1" } ], "is_error": false },
+          { "start_timestamp": "2026-01-12T15:01:40.000000Z", "stop_timestamp": "2026-01-12T15:01:50.000000Z", "flags": null, "type": "tool_use", "name": "artifacts",
+            "input": { "id": "hello-page", "command": "update", "old_str": "<h1>小明</h1>", "new_str": "<h1>阿明</h1>", "version_uuid": "v-2" } },
+          { "start_timestamp": "2026-01-12T15:01:55.000000Z", "stop_timestamp": "2026-01-12T15:02:00.000000Z", "flags": null, "type": "text", "text": "写好了", "citations": [] },
+          { "start_timestamp": null, "stop_timestamp": null, "flags": null, "type": "mystery_block", "payload": 1 }
+        ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0009", "parent_message_uuid": "00000000-0000-4000-8000-000000000000",
+        "text": "（重新说）你好呀，我是阿明", "sender": "human",
+        "created_at": "2026-01-12T15:20:00.000000Z", "updated_at": "2026-01-12T15:20:00.000000Z",
+        "content": [ { "start_timestamp": "2026-01-12T15:20:00.000000Z", "stop_timestamp": "2026-01-12T15:20:00.000000Z", "flags": null, "type": "text", "text": "（重新说）你好呀，我是阿明", "citations": [] } ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0010", "parent_message_uuid": "m-0008",
+        "text": "", "sender": "human",
+        "created_at": "2026-01-12T15:30:00.000000Z", "updated_at": "2026-01-12T15:30:00.000000Z",
+        "content": [ { "start_timestamp": null, "stop_timestamp": null, "flags": null, "type": "voice_note", "title": "语音", "text": "谢谢你呀" } ],
+        "attachments": [], "files": []
+      },
+      {
+        "uuid": "m-0011", "parent_message_uuid": "m-0010",
+        "text": "不客气", "sender": "assistant",
+        "created_at": "2026-01-12T15:30:10.000000Z", "updated_at": "2026-01-12T15:30:10.000000Z",
+        "content": [ { "start_timestamp": "2026-01-12T15:30:05.000000Z", "stop_timestamp": "2026-01-12T15:30:10.000000Z", "flags": null, "type": "text", "text": "不客气", "citations": [] } ],
+        "attachments": [], "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "c0a1e7f2-2222-4a6b-9c1d-000000000002",
+    "name": "",
+    "summary": "",
+    "created_at": "2026-01-15T09:00:00.000000Z",
+    "updated_at": "2026-01-15T09:05:00.000000Z",
+    "account": { "uuid": "acc00000-0000-4000-8000-0000000000aa" },
+    "chat_messages": [
+      { "uuid": "old-1", "text": "老格式：没有父指针的一条", "sender": "human", "created_at": "2026-01-15T09:00:00.000000Z", "updated_at": "2026-01-15T09:00:00.000000Z", "content": [], "attachments": [], "files": [] },
+      { "uuid": "old-2", "text": "This block is not supported on your current device yet.\n\n这是回复", "sender": "assistant", "created_at": "2026-01-15T09:00:10.000000Z", "updated_at": "2026-01-15T09:00:10.000000Z", "content": [], "attachments": [], "files": [] },
+      { "uuid": "old-3", "text": "再问一句", "sender": "human", "created_at": "2026-01-15T09:05:00.000000Z", "updated_at": "2026-01-15T09:05:00.000000Z", "content": [], "attachments": [], "files": [] }
+    ]
+  },
+  {
+    "uuid": "c0a1e7f2-3333-4a6b-9c1d-000000000003",
+    "name": "空的",
+    "created_at": "2026-01-16T09:00:00.000000Z",
+    "updated_at": "2026-01-16T09:00:00.000000Z",
+    "account": { "uuid": "acc00000-0000-4000-8000-0000000000aa" },
+    "chat_messages": []
+  }
+]

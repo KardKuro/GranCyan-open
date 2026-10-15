@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 下拉栏播放卡片上的「词」按钮（开/关桌面歌词悬浮条）：两行字的样子 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M3,7h13v2.2H3zM8,12.8h13V15H8zM5,17.6h9v2.2H5z"/>
+</vector>

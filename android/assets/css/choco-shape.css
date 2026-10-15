@@ -1,0 +1,177 @@
+/* ═══════════════════════════════════════════════════════════════════
+   「巧克力」界面形状（2026-10-10）
+   用户给薄荷巧克力配色时顺口说的：「巧克力可以专门做一种界面形状」。
+
+   一块板状巧克力最好认的三样东西，这里全做成了形状：
+     · 压出来的格子 —— 气泡底上一道道浅浅的凹槽（暗线 + 下面一丝反光），
+       一格 88×64，长消息就是一整板，短消息就是掰下来的一两格
+     · 模具倒出来的斜边 —— 内阴影：左上一道亮、右下一道厚的暗，像有厚度
+     · 被咬了一口 —— 她的气泡右上角缺一个牙印（mask 挖两个圆）
+
+   只改形状和质感，颜色一律走配色变量（--bg-elevated / --bg-hover / --accent-rgb），
+   所以和哪个色温都能配；配「薄荷巧克力」色温才是完整的样子。
+   除了外观面板里的小样，每条规则都挂在 html.ui-choco 底下（测试反过来验），
+   没选这个形状时这里一条都不生效。
+   排在 mint-choc.css 之后：同样的部件两边都写了，形状这边要赢。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 外观面板里的小样：一块 2×2 的可可色小巧克力，右上角咬掉一口 */
+.shape-choco {
+  border-radius:6px;
+  background:
+    linear-gradient(90deg,transparent calc(50% - 1.5px),rgba(0,0,0,.4) calc(50% - 1.5px) calc(50% + .5px),rgba(255,255,255,.12) calc(50% + .5px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),
+    linear-gradient(transparent calc(50% - 1.5px),rgba(0,0,0,.4) calc(50% - 1.5px) calc(50% + .5px),rgba(255,255,255,.12) calc(50% + .5px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),
+    #6e4040;
+  box-shadow:inset 1.5px 1.5px 0 rgba(255,255,255,.14),inset -2px -2.5px 0 rgba(0,0,0,.35);
+  -webkit-mask:radial-gradient(circle at calc(100% + 1px) 5px,#0000 6px,#000 6.5px),radial-gradient(circle at calc(100% - 8px) -2px,#0000 5.5px,#000 6px);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+
+/* ── 骨架：圆角统一换成「模具」那种中等圆角，再备好格子和斜边 ── */
+html.ui-choco {
+  --radius-sm:6px;--radius-md:9px;--radius-lg:13px;--radius-xl:18px;
+  --ck-cell:88px;--ck-row:64px;
+  --ck-groove:rgba(0,0,0,.2);--ck-shine:rgba(255,255,255,.045);
+  /* 凹槽 = 2px 暗线 + 1px 反光，横竖各一层 */
+  --ck-grid:
+    repeating-linear-gradient(90deg,transparent 0 calc(var(--ck-cell) - 3px),var(--ck-groove) calc(var(--ck-cell) - 3px) calc(var(--ck-cell) - 1px),var(--ck-shine) calc(var(--ck-cell) - 1px) var(--ck-cell)),
+    repeating-linear-gradient(180deg,transparent 0 calc(var(--ck-row) - 3px),var(--ck-groove) calc(var(--ck-row) - 3px) calc(var(--ck-row) - 1px),var(--ck-shine) calc(var(--ck-row) - 1px) var(--ck-row));
+  /* 斜边：左上受光、右下压暗（底边最厚，看起来有厚度） */
+  --ck-bevel:inset 2px 2px 0 rgba(255,255,255,.07),inset -2px -4px 0 rgba(0,0,0,.3);
+  --ck-bevel-sm:inset 1px 1px 0 rgba(255,255,255,.08),inset -1.5px -2.5px 0 rgba(0,0,0,.28);
+  /* 薄荷青这种亮色块上的斜边：亮边要更亮才看得出来 */
+  --ck-bevel-bright:inset 1.5px 1.5px 0 rgba(255,255,255,.45),inset -2px -3px 0 rgba(0,0,0,.28);
+}
+
+/* ── 消息：每条都是一板巧克力 ── */
+html.ui-choco .bubble.ai:not(.bubble-sticker) {
+  background:var(--ck-grid),linear-gradient(160deg,rgba(255,255,255,.035),transparent 45%),var(--bg-elevated);
+  border:none;border-radius:var(--radius-lg);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:var(--ck-bevel),0 3px 0 rgba(0,0,0,.28),0 10px 22px rgba(0,0,0,.22);
+  padding:15px 19px 17px;
+}
+/* 单栏模式（用户平时用的就是这个）本来不套气泡、底色几乎透明，
+   它那条带 #chatWindow 的选择器特异性高，这里得跟着写一遍才盖得住。整宽的一大板。 */
+html.ui-choco #chatWindow.gc-mode-solo .msg-group.ai .bubble.ai:not(.bubble-sticker) {
+  background:var(--ck-grid),linear-gradient(160deg,rgba(255,255,255,.035),transparent 45%),var(--bg-elevated);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--ck-bevel),0 3px 0 rgba(0,0,0,.28),0 10px 22px rgba(0,0,0,.22);
+  padding:16px 22px 19px;
+}
+/* 她的气泡：浅一档的牛奶巧克力，底边露出一层强调色的夹心（薄荷巧克力的那层薄荷），
+   右上角被咬了一口。
+   applyAccentCSS 往 .bubble.user 写了 !important 的底色，渲染时还写了内联光晕，都得 !important 盖。
+   mask 会把外阴影一起裁掉，所以这块只用内阴影做厚度。 */
+html.ui-choco .bubble.user:not(.bubble-sticker) {
+  background:var(--ck-grid),linear-gradient(160deg,rgba(255,255,255,.05),transparent 45%),var(--bg-hover) !important;
+  border:none !important;border-radius:var(--radius-lg);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:inset 2px 2px 0 rgba(255,255,255,.08),inset -2px 0 0 rgba(0,0,0,.25),inset 0 -5px 0 rgba(var(--accent-rgb,99,102,241),.55) !important;
+  padding:15px 24px 19px 18px;
+  -webkit-mask:radial-gradient(circle at calc(100% + 3px) 11px,#0000 12px,#000 12.5px),radial-gradient(circle at calc(100% - 15px) -5px,#0000 12px,#000 12.5px);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+html.ui-choco .bubble .bubble-quote,
+html.ui-choco .bubble.ai blockquote { border-radius:var(--radius-sm); }
+html.ui-choco .bubble.ai pre { border-radius:var(--radius-md); }
+/* 思考过程的按钮和消息下面那排小按钮：一颗颗小巧克力豆 */
+html.ui-choco .think-toggle { border-radius:var(--radius-md);box-shadow:var(--ck-bevel-sm); }
+html.ui-choco .msg-action-btn { border-radius:var(--radius-sm);box-shadow:var(--ck-bevel-sm); }
+
+/* ── 输入栏：一条长巧克力，发送键是一颗薄荷糖 ── */
+html.ui-choco .input-bar {
+  border-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:var(--ck-bevel),0 3px 0 rgba(0,0,0,.25);
+}
+html.ui-choco .input-bar:focus-within { border-color:transparent;box-shadow:var(--ck-bevel),0 0 0 2px rgba(var(--accent-rgb,99,102,241),.55),0 3px 0 rgba(0,0,0,.25); }
+html.ui-choco .input-bar.has-content .plus-btn,
+html.ui-choco .expand-send-btn { border-radius:var(--radius-md) !important;box-shadow:var(--ck-bevel-bright) !important; }
+
+/* ── 侧栏：按钮和当前对话是压出来的块 ── */
+html.ui-choco .new-chat-btn { border-color:transparent;background:var(--bg-elevated);box-shadow:var(--ck-bevel); }
+html.ui-choco .new-chat-btn:hover { background:var(--bg-hover);border-color:transparent;box-shadow:var(--ck-bevel); }
+/* A25 主按钮：巧克力下也要一眼认出来 —— 压块底上叠一层强调色 */
+html.ui-choco .sidebar-top > .new-chat-btn:first-of-type { background:linear-gradient(135deg,rgba(var(--accent-rgb),.20),rgba(var(--accent-rgb),.08)),var(--bg-elevated); }
+html.ui-choco .sidebar-top > .new-chat-btn:first-of-type:hover { background:linear-gradient(135deg,rgba(var(--accent-rgb),.26),rgba(var(--accent-rgb),.12)),var(--bg-hover); }
+html.ui-choco .chat-item.active { border-left:none;padding-left:10px;box-shadow:var(--ck-bevel-sm); }
+
+/* ── 设置：整个面板是一个巧克力礼盒，选项是一格格 ── */
+html.ui-choco .settings-panel { box-shadow:var(--ck-bevel),0 30px 80px rgba(0,0,0,.5); }
+html.ui-choco .appearance-choice { border-color:transparent;background:var(--bg-elevated);box-shadow:var(--ck-bevel-sm); }
+html.ui-choco .appearance-choice:hover { background:var(--bg-hover);border-color:transparent; }
+html.ui-choco .appearance-choice.active { background:var(--accent-soft);border-color:transparent;box-shadow:var(--ck-bevel-sm),0 0 0 2px var(--accent); }
+
+/* ═══ 第二批（用户：「巧克力可以出现在更多地方（确信」）═══ */
+
+/* ── 空页面：猫背后斜放着一板被咬过的巧克力，替掉原来那几圈同心圆 ──
+   3×4 格，每格自己有斜边（亮边 + 暗边各一层重复渐变），整板再咬一口。 */
+html.ui-choco .empty-state > svg { display:none; }
+html.ui-choco .empty-state::before {
+  content:"";position:absolute;left:50%;top:46%;z-index:0;pointer-events:none;
+  width:216px;height:276px;margin:-138px 0 0 -108px;border-radius:14px;
+  transform:rotate(-12deg);opacity:.55;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 69px,rgba(0,0,0,.4) 69px 72px),
+    repeating-linear-gradient(180deg,transparent 0 66px,rgba(0,0,0,.4) 66px 69px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.09) 0 3px,transparent 3px 72px),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.09) 0 3px,transparent 3px 69px),
+    linear-gradient(160deg,rgba(255,255,255,.06),transparent 50%),
+    var(--bg-hover);
+  box-shadow:inset 3px 3px 0 rgba(255,255,255,.08),inset -3px -6px 0 rgba(0,0,0,.35);
+  -webkit-mask:radial-gradient(circle at calc(100% + 6px) 22px,#0000 30px,#000 31px),radial-gradient(circle at calc(100% - 34px) -10px,#0000 28px,#000 29px);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+
+/* ── 想的时候：思考框是模具里压下去的一格凹槽，三个点换成三颗巧克力豆（尖朝上） ── */
+html.ui-choco .thinking-inline {
+  border:none;border-radius:var(--radius-md);background:rgba(0,0,0,.16);
+  box-shadow:inset 2px 2px 0 rgba(0,0,0,.28),inset -1px -1px 0 rgba(255,255,255,.05);
+}
+html.ui-choco .thinking-inline.streaming { box-shadow:inset 2px 2px 0 rgba(0,0,0,.28),inset -1px -1px 0 rgba(255,255,255,.05),0 0 0 1.5px rgba(var(--accent-rgb,99,102,241),.45); }
+html.ui-choco .thinking-inline-header:hover { background:rgba(255,255,255,.03); }
+html.ui-choco .thinking-inline.done .thinking-inline-header { color:var(--text-dim); }
+html.ui-choco .thinking-inline-body { border-top:1px solid rgba(0,0,0,.25); }
+html.ui-choco .thinking-dots span {
+  display:inline-block;width:7px;height:7px;margin:0 3px;vertical-align:middle;
+  font-size:0;color:transparent;background:var(--accent);
+  border-radius:0 50% 50% 50%;transform:rotate(45deg);
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.4),inset -1px -1px 0 rgba(0,0,0,.25);
+}
+/* 边写边冒出来的光标：一根压扁的「_」薄荷糖条 */
+html.ui-choco .stream-cursor {
+  height:3px;border-radius:1px;
+  box-shadow:var(--ck-bevel-bright);
+}
+/* 分隔线就是一道压出来的槽 */
+html.ui-choco .bubble.ai hr { border:none;height:3px;background:linear-gradient(var(--ck-groove) 0 2px,var(--ck-shine) 2px 3px); }
+
+/* ── 顶栏和侧栏零碎：选模型的按钮是一颗夹心糖，搜索框是模具里的凹槽 ── */
+html.ui-choco #modelDropdownWrap > button { border-color:transparent;border-radius:var(--radius-md);box-shadow:var(--ck-bevel-sm),0 2px 0 rgba(0,0,0,.25); }
+html.ui-choco .model-pill { border-color:transparent;border-radius:var(--radius-md);box-shadow:var(--ck-bevel-sm); }
+html.ui-choco .model-pill.active { border-color:transparent;box-shadow:var(--ck-bevel-sm),0 0 0 1.5px var(--accent); }
+html.ui-choco #chatSearch {
+  border-color:transparent;border-radius:var(--radius-md);background:rgba(0,0,0,.18);
+  box-shadow:inset 2px 2px 0 rgba(0,0,0,.28),inset -1px -1px 0 rgba(255,255,255,.05);
+}
+html.ui-choco #chatSearch:focus { border-color:transparent;box-shadow:inset 2px 2px 0 rgba(0,0,0,.28),0 0 0 1.5px var(--accent); }
+html.ui-choco .chat-item:hover { box-shadow:var(--ck-bevel-sm); }
+
+/* ── 右边上下翻的小条：一根巧克力棒，中间那道分隔是槽 ── */
+html.ui-choco #msgNavBar {
+  background:var(--bg-elevated);border-color:transparent;border-radius:12px;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:var(--ck-bevel),0 3px 0 rgba(0,0,0,.25);
+}
+html.ui-choco .msg-nav-btn { border-radius:var(--radius-sm); }
+html.ui-choco #msgNavBar .nav-sep { height:3px;background:linear-gradient(var(--ck-groove) 0 2px,var(--ck-shine) 2px 3px); }
+
+/* ── 万事屋：一盒巧克力，每个小组件是一颗 ── */
+html.ui-choco .hub-shell { border-color:transparent;background:var(--bg-surface);box-shadow:var(--ck-bevel),0 32px 80px rgba(0,0,0,.6); }
+html.ui-choco .hub-nav-btn.active { box-shadow:var(--ck-bevel-sm); }
+html.ui-choco .hub-widgets-grid .widget-item {
+  border-color:transparent;border-radius:var(--radius-lg);
+  background:var(--ck-grid),linear-gradient(160deg,rgba(255,255,255,.04),transparent 45%),var(--bg-elevated);
+  box-shadow:var(--ck-bevel),0 3px 0 rgba(0,0,0,.25),0 8px 20px rgba(0,0,0,.18);
+}
+html.ui-choco .hub-widgets-grid .widget-item:hover { border-color:transparent;box-shadow:var(--ck-bevel),0 0 0 1.5px var(--accent-border),0 5px 0 rgba(0,0,0,.25),0 13px 28px rgba(0,0,0,.24); }

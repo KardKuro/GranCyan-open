@@ -1,0 +1,17 @@
+[
+  { "name": "happy",     "desc": "开心/高兴",   "emoji": "😊", "file": "happy.png" },
+  { "name": "laugh",     "desc": "大笑",       "emoji": "😂", "file": "laugh.png" },
+  { "name": "angry",     "desc": "生气/愤怒",   "emoji": "😠", "file": "angry.png" },
+  { "name": "love",      "desc": "喜欢/爱",     "emoji": "😍", "file": "love.png" },
+  { "name": "cool",      "desc": "酷/墨镜",     "emoji": "😎", "file": "cool.png" },
+  { "name": "think",     "desc": "思考/疑惑",   "emoji": "🤔", "file": "think.png" },
+  { "name": "surprise",  "desc": "惊讶/震惊",   "emoji": "😮", "file": "surprise.png" },
+  { "name": "cry",       "desc": "难过/大哭/崩溃", "emoji": "😭", "file": "cry.png" },
+  { "name": "sweat",     "desc": "尴尬/汗",     "emoji": "😅", "file": "sweat.png" },
+  { "name": "sleep",     "desc": "困了/无聊",   "emoji": "😴", "file": "sleep.png" },
+  { "name": "heart",     "desc": "爱心/比心",   "emoji": "❤️", "file": "heart.png" },
+  { "name": "thumbsup",  "desc": "点赞/厉害",   "emoji": "👍", "file": "thumbsup.png" },
+  { "name": "fire",      "desc": "火/厉害/热",  "emoji": "🔥", "file": "fire.png" },
+  { "name": "facepalm",  "desc": "捂脸/无语",   "emoji": "🤦", "file": "facepalm.png" },
+  { "name": "wave",      "desc": "挥手/打招呼",  "emoji": "👋", "file": "wave.png" }
+]

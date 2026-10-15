@@ -1,0 +1,23 @@
+const fs=require('fs'),vm=require('vm');let pass=0,fail=0;
+function ok(n,v){if(v){console.log('  ✓ '+n);pass++}else{console.error('  ✗ '+n);fail++}}
+const src=fs.readFileSync('js/34-suggestions.js','utf8');
+const s={console,escHtml:x=>String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};vm.createContext(s);vm.runInContext(src,s);
+console.log('\n[回复建议气泡]');
+const chat={suggestionsEnabled:true,isGroupChat:false},node={id:2};
+const out=s.extractSuggestionTags('正文\n[[SUGGEST: 继续讲讲 | 给我一个例子 | 继续讲讲 | 总结一下]]',node,chat);
+ok('标签从正文隐藏',out==='正文'&&!out.includes('SUGGEST'));
+ok('去重并限制三条',JSON.stringify(node.suggestions)===JSON.stringify(['继续讲讲','给我一个例子','总结一下']));
+const blocks=[{type:'text',text:'回答\n[[SUGGEST: A | B]]'}];s._stripSuggestionTagsFromBlocks(blocks,node,chat);
+ok('blocks 路径也隐藏标签',blocks[0].text==='回答'&&node.suggestions.length===2);
+ok('只在最后一条非流式回复显示',s.renderSuggestionBubbles({...node,id:2,streaming:false},{...chat,headId:2}).includes('chat-suggestion'));
+ok('旧回复不显示',s.renderSuggestionBubbles({...node,id:1,streaming:false},{...chat,headId:2})==='');
+ok('关闭时不存建议',(()=>{const n={};s.extractSuggestionTags('x [[SUGGEST: A | B]]',n,{suggestionsEnabled:false});return n.suggestions.length===0})());
+ok('模型不写标签时仍有三条本地建议',(()=>{const n={};s.extractSuggestionTags('下面给你一段代码实现。',n,chat);return n.suggestions.length===3&&n.suggestions[0]==='帮我继续完善'})());
+const html=fs.readFileSync('index.html','utf8'),api=fs.readFileSync('js/05-prompts-api.js','utf8'),models=fs.readFileSync('js/03-chats-models.js','utf8');
+ok('脚本挂载在页面',html.includes('js/34-suggestions.js'));
+ok('控制面板有开关',models.includes('toggleChatSuggestions()'));
+ok('提示和解析都接通',api.includes('suggestionPromptFor(chat)')&&api.includes('extractSuggestionTags(finalText')&&api.includes('_stripSuggestionTagsFromBlocks'));
+ok('多模型时不要求建议',src.includes("getActiveChatModelIds().length!==1"));
+ok('旧消息兜底隐藏标签',/function memCmdToHtml[\s\S]*?SUGGEST/.test(api));
+ok('功能指南已更新',html.includes('<div class="help-key">回复建议</div>'));
+console.log(`\n${fail?'❌':'✅'} ${pass} passed, ${fail} failed`);if(fail)process.exit(1);

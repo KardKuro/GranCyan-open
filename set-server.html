@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 Grancyan 服务器地址</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>设置服务器地址</h1>
+    <div class="info">
+        <p>当前服务器地址：<span id="current">未设置</span></p>
+    </div>
+    <input type="text" id="serverAddr" value="" placeholder="输入服务器地址，例如 http://192.168.1.100:3000">
+    <button onclick="setServer()">保存设置</button>
+    <div class="info" style="margin-top: 20px;">
+        <p>设置完成后，请打开 Grancyan 应用，点击"📚"阅读按钮即可访问书架。</p>
+    </div>
+
+    <script>
+        // 显示当前设置
+        const current = localStorage.getItem('serverAddress');
+        if (current) {
+            document.getElementById('current').textContent = current;
+        }
+
+        function setServer() {
+            const addr = document.getElementById('serverAddr').value.trim();
+            if (!addr) {
+                alert('请输入服务器地址');
+                return;
+            }
+            localStorage.setItem('serverAddress', addr);
+            document.getElementById('current').textContent = addr;
+            alert('设置成功！服务器地址：' + addr);
+        }
+    </script>
+</body>
+</html>

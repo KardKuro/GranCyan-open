@@ -1,0 +1,101 @@
+# 依赖与打包产物（都能重新生成）
+node_modules/
+# 不带斜杠的这行是给软链接准备的：node_modules 是链接时上面那行匹配不到
+node_modules
+dist/
+dist_build/
+dist-new/
+dist-old/
+__pycache__/
+
+# 安装包与签名（keystore 丢了 APK 就不能原地升级——记得另外备份一份！）
+*.apk
+*.apk.idsig
+grancyan.keystore
+# keystore 的密码（android/build.ps1 首次生成 keystore 时随机生成；也可以用环境变量 GRANCYAN_KEYSTORE_PASS 代替）
+keystore.pass
+# 手动打的分发 zip（近 200MB，dist/ 的压缩副本，随时能重打）。
+# 通配是刻意的：换个带版本号的名字也照样挡住。
+Grancyan*.zip
+
+# 本地数据（手环数据库）
+# 注意：stickers/ 是自带表情库（作者手绘），属于源码资产，要进版本库；用户收藏在 stickers-fav/。
+Gadgetbridge.db
+# 收藏夹整个忽略，只留一个 README 当占位——不然新克隆下来没这个目录，
+# 上传接口第一次写入前得自己 mkdir（虽然它会建，但目录在版本库里有个说明更清楚）
+stickers-fav/*
+!stickers-fav/README.txt
+# 表情包分组（stickers-packs/<包id>/）是用户自己往里丢的图，不进版本库；
+# 目录不存在时 server 和 android/build.ps1 都会当作「没有包」跳过
+stickers-packs/*
+!stickers-packs/README*
+
+*.log
+.env
+
+# MCP 远程操控的 token —— 等同于这台电脑的 shell 密码，绝不能进版本库
+.mcp-token
+# 手机配对码 —— 局域网设备连 /api 的钥匙，同上
+.pair-token
+
+# SQLite 运行时临时文件
+*.db-shm
+*.db-wal
+
+# 本地自签 TLS 证书（给手机端 https:// 用；缺了 server 会自动退化成 HTTP）
+# 私钥不进版本库——要重新生成见 README/自检提示
+key.pem
+cert.pem
+
+# 伴读书架的运行时数据库（阅读进度/笔记，属于个人数据不是代码）
+coread.db
+coread.db-shm
+coread.db-wal
+
+# 育儿室存档（本机数据，不进版本库）
+nursery-saves/
+
+# 整首听歌的歌曲档案（Gemini 写的分段 + 聊过的话，server/music-profile.js）
+music-profiles/
+
+# Ombre-Brain 导出的记忆正文（私人记忆明文，可由 scripts/ombre-import.js 随时重新生成）
+scripts/ombre-memories.json
+
+# 音标查询缓存（纯粹是省外网请求的加速文件，删了会自己重建）
+ipa-cache.json
+# 例句查询缓存（Tatoeba，同上）
+example-cache.json
+# 例句的中文译文缓存（本地 Ollama 翻的，同上）
+sentence-zh.json
+tts-cache/
+# 学习工具的大件离线包（GeoGebra 50MB 等）：电脑后端当静态文件发，手机从电脑拿。
+# 不进 git、不进 exe（package.json 的 ignore）、不进 APK（build.ps1 只拷 css/js/img）。
+# 丢了重下：GeoGebra 离线包 https://download.geogebra.org/package/geogebra-math-apps-bundle
+labkit/
+
+# 冒烟测试截图（每次跑都重生成，是给人看一眼的产物不是源码）
+tests/out/
+
+# Electron ABI 的原生模块产物（scripts/prep-native.js 生成，可重建）
+build-native/
+
+# adb 自动连接的运行时状态（本机当前 IP:端口 和滚动日志，换台机器毫无意义）
+tools/adb-autoconnect.state.json
+tools/adb-autoconnect.log
+
+# 用户数据备份（IndexedDB 快照等），不入库
+data-backups/
+
+# 视觉预览脚本吐的截图（tests/preview-workbench.js 随时能重生成）
+workbench-cli-preview.png
+
+# 故障注入脚本的运行时痕迹（源码副本 + 互斥锁），都不入库
+tests/.fault-inject-bak/
+tests/.fault-inject.lock
+tests/.fault-inject.lock.stale.*
+
+# Gemini 出图落盘的地方（Nano Banana 那几个模型）。图片不是代码，而且七天后
+# server/gemini.js 会自己清掉 —— 进版本库没有意义。
+gemini-out/
+# 高级记忆语义路的模型缓存（server 从 hf-mirror 拉下来的，/api/hf/）
+hf-cache/

@@ -1,0 +1,115 @@
+'use strict';
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const backend = fs.readFileSync(path.join(__dirname, '..', 'code-workbench.js'), 'utf8');
+const ui = fs.readFileSync(path.join(__dirname, '..', 'js', '41-code-workbench.js'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const core = fs.readFileSync(path.join(__dirname, '..', 'js', '01-core.js'), 'utf8');
+const boot = fs.readFileSync(path.join(__dirname, '..', 'js', '14-boot-brain-hub.js'), 'utf8');
+assert.match(backend, /state\.json/);
+assert.match(backend, /writeFileSync\(tmp/);
+assert.match(backend, /renameSync\(tmp, STATE\)/);
+assert.match(backend, /swap-install\.ps1/);
+assert.match(backend, /while\(Get-Process -Id \$WaitPid/);
+assert.doesNotMatch(ui, /上次关机或退出时仍在运行/);
+assert.match(ui, /agentCwd: p\.cwd/);
+assert.match(ui, /\/api\/local-gpt/);
+assert.match(ui, /\/api\/local-claude/);
+assert.match(ui, /await appPrompt\('项目目录/);
+assert.doesNotMatch(ui, /\bprompt\(/);
+assert.doesNotMatch(ui, /\bconfirm\(/);
+assert.match(ui, /if \(d\.runId\) \{ s\.runId = d\.runId/);
+assert.match(ui, /\/api\/agent-run\/.*\/stop/);
+assert.match(ui, /if \(!s\.runId\)[\s\S]*controller\.abort\(\)/);
+assert.match(ui, /if \(s\.stopRequested\) cwDispatchStop\(s\)/);
+assert.match(ui, /任务启动超过 45 秒仍未拿到运行凭证/);
+assert.match(ui, /function cwPruneEmptySessions/);
+assert.match(ui, /function cwDeleteSession/);
+assert.match(ui, /async function cwRenameSession/);
+assert.match(ui, /appPrompt\('修改会话标题', found\.s\.title/);
+assert.match(ui, /cwRenameSession\('\$\{x\.id\}'\)/);
+assert.match(ui, /slice\(0, 60\)/);
+assert.match(ui, /function cwRestoreSession/);
+assert.match(ui, /function cwEmptyTrash/);
+assert.match(html, /cwTrashToggle/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8'), /spawn\('taskkill\.exe'.*'\/t'.*'\/f'/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8'), /等代理探测期间客户端已取消，这轮不再 spawn/);
+assert.match(ui, /const _cwStreams = new Map\(\)/);
+assert.match(ui, /agentSub: 'cw:' \+ s\.id/);
+assert.match(ui, /cwRecoverRuns\(\)/);
+assert.match(ui, /function cwScheduleRecoverRuns\(delay = 1500\)/);
+assert.match(ui, /if \(_cwRecoverTimer\) return/);
+assert.match(ui, /界面连接已脱离[\s\S]*cwScheduleRecoverRuns\(\)/);
+assert.match(ui, /catch \{[\s\S]*cwScheduleRecoverRuns\(2000\)/);
+assert.match(ui, /if \(s\.status === 'running'\) cwScheduleRecoverRuns\(\)/);
+assert.match(ui, /runEventIndex/);
+assert.match(ui, /Math\.max\(s\.runEventIndex \|\| 0, Number\(d\.resumeFrom\) \|\| 0\)/);
+assert.match(ui, /cwAddImageFiles/);
+assert.match(ui, /images\.map\(x => x\.url\)/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8'), /agentImageFiles.*materializeImages[\s\S]*Read 工具读取这些图片[\s\S]*new Set\(agentImageFiles/);
+assert.match(ui, /cwExecuteCommand/);
+assert.match(html, /cwImageInput/);
+assert.doesNotMatch(ui, /let _cwAbort/);
+assert.doesNotMatch(ui, /send\.disabled = !s \|\| s\.status === 'running'/);
+assert.match(ui, /send\.textContent = s\?\.status === 'running' \? '排队' : '开始做'/);
+assert.match(ui, /queued: true/);
+assert.match(ui, /if \(_cwStreams\.has\(s\.id\)\)/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8'),
+  /r\.subId === String\(agentSub\)[\s\S]*拒绝重复启动[\s\S]*duplicate: true/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8'),
+  /app\.post\('\/api\/local-claude'[\s\S]{0,900}res\.status\(409\)/);
+assert.match(ui, /setTimeout\(\(\) => cwRunTurn\(p, s, next\.content, next, queuedImages\), 0\)/);
+assert.match(ui, /visibleProjects.*provider/s);
+assert.match(ui, /_cw\.activeProvider = v/);
+assert.match(ui, /function cwFormatDuration/);
+assert.match(ui, /clauding…[\s\S]*thinking…/);
+assert.match(ui, /已运行 \$\{cwFormatDuration/);
+assert.match(ui, /firstActionKind === 'thinking' \? '思考约' : '首步'/);
+assert.match(ui, /总用时 \$\{cwFormatDuration/);
+assert.match(ui, /s\.runStartedAt = s\.runStartedAt \|\| Date\.now\(\)/);
+assert.match(ui, /cwMarkFirstAction\(s, answer, 'thinking'\)/);
+assert.match(ui, /cwFinishTiming\(s, answer\)/);
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'css', 'grancyan.css'), 'utf8'), /cw-msg-timing/);
+assert.match(ui, /function cwToolEventText/);
+assert.match(ui, /cw-diff-\$\{cls\}/);
+assert.match(ui, /e\.key === 'Escape'[\s\S]*cwSession\(\)\?\.status === 'running'[\s\S]*cwStop\(\)/);
+assert.match(ui, /e\.preventDefault\(\); e\.stopPropagation\(\)/);
+const workbenchCss = fs.readFileSync(path.join(__dirname, '..', 'css', 'grancyan.css'), 'utf8');
+assert.match(workbenchCss, /\.cw-diff-add\{color:#86efac/);
+assert.match(workbenchCss, /\.cw-diff-del\{color:#fda4af/);
+assert.match(html, /codeWorkbenchModal/);
+assert.match(core, /let _dbOpenPromise = null/);
+assert.match(core, /for \(let i = 0; i < 3; i\+\+\)/);
+assert.match(core, /db\.onversionchange/);
+assert.match(boot, /停止初始化以保护现有数据/);
+
+const timingFrom = ui.indexOf('function cwFormatDuration(');
+const timingTo = ui.indexOf('function cwStartThinkingTicker(', timingFrom);
+assert.ok(timingFrom >= 0 && timingTo > timingFrom, '能提取工作台计时函数');
+const timingSandbox = { Date, Math, Number };
+vm.createContext(timingSandbox);
+vm.runInContext(ui.slice(timingFrom, timingTo)
+  + '\nthis.fmt = cwFormatDuration; this.label = cwTimingText;', timingSandbox);
+assert.equal(timingSandbox.fmt(59_999), '59s');
+assert.equal(timingSandbox.fmt(61_000), '1m 1s');
+assert.equal(timingSandbox.fmt(3_661_000), '1h 1m');
+assert.equal(timingSandbox.label({ role: 'assistant', at: 1000, timing: {
+  requestedAt: 1000, endedAt: 11_000, firstActionMs: 4000, firstActionKind: 'thinking'
+} }), '思考约 4s · 总用时 10s');
+assert.equal(timingSandbox.label({ role: 'assistant', at: 1000, timing: {
+  requestedAt: 1000, endedAt: 11_000, firstActionMs: 2500, firstActionKind: 'tool'
+} }), '首步 2s · 总用时 10s');
+
+const diffFrom = ui.indexOf('function cwDiffLines(');
+const diffTo = ui.indexOf('function cwRenderEvent(', diffFrom);
+assert.ok(diffFrom >= 0 && diffTo > diffFrom, '能提取工作台 diff 格式化函数');
+const diffSandbox = { escHtml: s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;') };
+vm.createContext(diffSandbox);
+vm.runInContext(ui.slice(diffFrom, diffTo)
+  + '\nthis.lines = cwDiffLines; this.tool = cwToolEventText;', diffSandbox);
+assert.match(diffSandbox.lines('- old\n+ new\n  same'), /class="cw-diff-del">- old<\/span>[\s\S]*class="cw-diff-add">\+ new<\/span>/);
+assert.doesNotMatch(diffSandbox.lines('{"temperature": -1}'), /cw-diff-del/);
+assert.equal(diffSandbox.tool({ name: 'Edit', input: { old_string: '旧行', new_string: '新行' } }), 'Edit\n- 旧行\n+ 新行');
+console.log('✅ code workbench wiring passed');

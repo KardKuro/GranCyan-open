@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════════════════════════════
+   薄荷巧克力 色温（2026-10-10）
+   参考：用户发的那张图——#744444 可可棕底上三道 #2ef0ff 薄荷青的笔画。
+   配色表在 js/02-state.js 的 THEME_TEMPERATURES.mintchoc，这里只放配色表管不到的：
+
+     · 主界面有一批底色写死成蓝黑（rgba(9,9,15) / rgba(13,13,22) 那一家），
+       别的配色本来就近黑看不出来，放到巧克力底上就是一块块冷色补丁 —— 换成 --bg-rgb。
+     · 薄荷青是亮色，grancyan.css 里「实心强调色 + 白字」的按钮全都看不清，
+       字换成黑巧色。新加这种按钮要补进下面那张表（tests/mint-choc.test.js 会点名）。
+     · 一层可可色顶光 + 零星薄荷碎（就是图里那三道笔画），压得很淡，不抢字。
+
+   除了外观面板里的小样，每条规则都挂在 html.theme-mintchoc 底下（测试反过来验），
+   没选这套配色时这里一条都不生效。
+   applyAccentCSS 往 <style> 里写了一批 !important，要盖它就得 !important。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 外观面板里的小样：可可棕上三道斜斜的薄荷笔画，跟图里一样 */
+.swatch-mintchoc { background:
+  linear-gradient(-8deg,transparent 22%,#2ef0ff 22% 31%,transparent 31% 47%,#2ef0ff 47% 55%,transparent 55% 70%,#2ef0ff 70% 78%,transparent 78%),
+  #744444; }
+
+/* --on-accent：实心薄荷青上写字用黑巧色。applyAccentCSS 按亮度会往 <html> inline 写同样的值，
+   这里是 JS 还没跑时的兜底。新按钮写 color:var(--on-accent) 就不用再进下面那张表 */
+html.theme-mintchoc { --mc-cocoa-rgb:116,68,68;--mc-ink:#2a1818;--on-accent:var(--mc-ink); }
+html.theme-mintchoc body { background:var(--bg-base); }
+
+/* 顶上一片可可色的光 + 薄荷碎。挂在 #bg-mask 的 ::before 上（::after 归色块形状用） */
+html.theme-mintchoc #bg-mask::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(120% 70% at 50% -12%,rgba(var(--mc-cocoa-rgb),.42),transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cg fill='%232ef0ff' fill-opacity='.13'%3E%3Crect x='40' y='60' width='34' height='6' rx='3' transform='rotate(-14 57 63)'/%3E%3Crect x='330' y='40' width='16' height='6' rx='3' transform='rotate(25 338 43)'/%3E%3Crect x='210' y='230' width='42' height='6' rx='3' transform='rotate(-6 231 233)'/%3E%3Crect x='440' y='290' width='12' height='7' rx='3.5' transform='rotate(-40 446 293)'/%3E%3Crect x='80' y='400' width='22' height='6' rx='3' transform='rotate(18 91 403)'/%3E%3Crect x='300' y='450' width='30' height='6' rx='3' transform='rotate(-22 315 453)'/%3E%3C/g%3E%3C/svg%3E") 0 0/520px 520px;
+}
+
+/* 写死成蓝黑的主界面件，换成巧克力 */
+html.theme-mintchoc #sidebar { background:rgba(var(--bg-rgb),.9);border-right-color:rgba(var(--mc-cocoa-rgb),.45); }
+html.theme-mintchoc .sidebar-top { background:linear-gradient(to bottom,rgba(46,240,255,.05) 0%,transparent 100%); }
+html.theme-mintchoc .sidebar-footer { background:linear-gradient(to bottom,transparent,rgba(var(--bg-rgb),.5)); }
+html.theme-mintchoc #footerMenu { background:rgba(var(--bg-rgb),.97); }
+html.theme-mintchoc header { background:rgba(var(--bg-rgb),.92);border-bottom-color:rgba(var(--mc-cocoa-rgb),.5);box-shadow:0 1px 0 0 rgba(46,240,255,.08); }
+html.theme-mintchoc .bubble.ai { background:linear-gradient(135deg,rgba(var(--mc-cocoa-rgb),.30) 0%,rgba(var(--bg-rgb),.62) 100%);border-color:rgba(var(--mc-cocoa-rgb),.55); }
+html.theme-mintchoc .bubble.ai .bubble-quote { background:rgba(46,240,255,.06); }
+html.theme-mintchoc .input-bar-wrap { --ib-rgb:var(--bg-rgb);background:linear-gradient(to bottom,transparent calc(var(--ib-pt) - 2px),rgba(var(--bg-rgb),.97) calc(var(--ib-pt) - 2px)); }
+html.theme-mintchoc .input-bar { background:rgba(var(--mc-cocoa-rgb),.28);border-color:rgba(var(--mc-cocoa-rgb),.7); }
+html.theme-mintchoc .composer-tray:has(> :not([style*="none"])) { background:rgba(var(--mc-cocoa-rgb),.28);border-color:rgba(var(--mc-cocoa-rgb),.7); }
+html.theme-mintchoc .settings-panel { background:rgba(var(--bg-rgb),.94);border-color:rgba(var(--mc-cocoa-rgb),.55); }
+html.theme-mintchoc .trash-card:hover { background:rgba(var(--mc-cocoa-rgb),.35) !important; }
+
+html.theme-mintchoc ::selection { background:rgba(46,240,255,.85);color:var(--mc-ink); }
+
+/* 实心薄荷青上的字：白字看不清，换黑巧色。
+   这张表是从 grancyan.css 里「background:var(--accent) + color:#fff」挑出来的，
+   最后三条是 applyAccentCSS 动态写的回收站按钮。 */
+html.theme-mintchoc .term-run,
+html.theme-mintchoc .expand-send-btn,
+html.theme-mintchoc #modelGroupMenu .mgm-sub:hover,
+html.theme-mintchoc .msel-btn.primary:hover,
+html.theme-mintchoc .input-bar.has-content .plus-btn,
+html.theme-mintchoc .input-bar.has-content .plus-btn:hover,
+html.theme-mintchoc .fancy-tab.on,
+html.theme-mintchoc .math-ins-btn:hover,
+html.theme-mintchoc .sticker-tab.active,
+html.theme-mintchoc .sticker-pick-bar button,
+html.theme-mintchoc .sticker-pick-tick,
+html.theme-mintchoc .sg-primary,
+html.theme-mintchoc .cam-use-btn,
+html.theme-mintchoc .help-foot-find:hover,
+html.theme-mintchoc .msg-edit-save,
+html.theme-mintchoc .mem-save-btn,
+html.theme-mintchoc .nurse-primary,
+html.theme-mintchoc .cap-chip-btn.on,
+html.theme-mintchoc .cap-submit,
+html.theme-mintchoc .study-btn.study-spell-go,
+html.theme-mintchoc .music-play,
+html.theme-mintchoc .music-btn-main,
+html.theme-mintchoc .music-search-go,
+html.theme-mintchoc .study-go,
+html.theme-mintchoc .study-imp-go,
+html.theme-mintchoc .study-ex-save,
+html.theme-mintchoc .who-primary,
+html.theme-mintchoc .pomo-start,
+html.theme-mintchoc #gcFindBar button:hover,
+html.theme-mintchoc .life-tab.on,
+html.theme-mintchoc .life-main,
+html.theme-mintchoc .moments-publish,
+html.theme-mintchoc .moment-reply-box .apply-btn,
+html.theme-mintchoc .gallery-submit,
+html.theme-mintchoc .ph-btn,
+html.theme-mintchoc .build-actions .build-go,
+html.theme-mintchoc .trash-item-recover:hover,
+html.theme-mintchoc .trash-batch-recover:hover { color:var(--mc-ink) !important; }

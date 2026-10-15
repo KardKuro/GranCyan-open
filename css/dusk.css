@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════════════════════════════
+   暮紫 色温（2026-10-14）
+   参考：【稿件展示/meme】Écoute Chérie（阴子九葵Jiuer）那种平面设计。
+   原片：灰紫纸 + 颗粒 + 暗角，银色巴洛克花边框全程不撤，
+   空镜只在正中放一个细线图标，后半段金色细线叠上来、是画面里唯一亮的东西。
+   配色表在 js/02-state.js 的 THEME_TEMPERATURES.dusk，这里只放配色表管不到的：
+
+     · 纸：#bg-mask::before 上一层颗粒（feTurbulence）+ 中间一团淡紫光（原片纸中间 #704A6F），四周自然压暗。
+     · 画框：main::before 四角银色卷草，左上画一份、其它三个角镜像；顶上让开 header。
+       z-index:-1 —— main 自己是一层（z-index:10），-1 落在 main 的底和内容之间，不盖字也不挡点击。
+     · 金只做强调色，不再加第二种亮色；写死蓝黑的主界面件换成梅紫。
+
+   除了外观面板里的小样，每条规则都挂在 html.theme-dusk 底下（tests/dusk.test.js 反过来验），
+   没选这套配色时这里一条都不生效。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 外观面板里的小样：紫纸中间亮四周暗，正中一颗金色四芒星 */
+.swatch-dusk { background:
+  radial-gradient(circle at 50% 50%,#e2b04a 0 1.5px,transparent 2px),
+  conic-gradient(from 45deg at 50% 50%,transparent 0 22deg,rgba(226,176,74,.9) 22deg 23deg,transparent 23deg 112deg,rgba(226,176,74,.9) 112deg 113deg,transparent 113deg 202deg,rgba(226,176,74,.9) 202deg 203deg,transparent 203deg 292deg,rgba(226,176,74,.9) 292deg 293deg,transparent 293deg),
+  radial-gradient(circle at 50% 50%,#704a6f,#2d1e31 75%); }
+
+html.theme-dusk { --dk-plum-rgb:112,74,111;--dk-silver-rgb:201,191,204;--dk-gold-rgb:226,176,74;--dk-ink:#1c1320;--on-accent:var(--dk-ink); }
+html.theme-dusk body { background:var(--bg-base); }
+
+/* 纸：颗粒 + 中间一团淡紫光 */
+html.theme-dusk #bg-mask::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 1 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/240px 240px,
+    radial-gradient(70% 60% at 58% 44%,rgba(var(--dk-plum-rgb),.42),transparent 72%);
+}
+
+/* 画框：四角银色卷草 */
+html.theme-dusk main::before {
+  content:'';position:absolute;inset:62px 8px 8px 8px;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c9bfcc' stroke-width='1.1' stroke-linecap='round'%3E%3Cpath d='M3 84V3H84'/%3E%3Cpath d='M9 62V9H62' stroke-width='.7'/%3E%3Cpath d='M84 3C96 3 101 13 94 18C89 22 83 17 87 13C89 11 92 12 92 14'/%3E%3Cpath d='M3 84C3 96 13 101 18 94C22 89 17 83 13 87C11 89 12 92 14 92'/%3E%3Cpath d='M9 9C25 12 34 22 38 38C22 34 12 25 9 9Z'/%3E%3Cpath d='M9 9L38 38' stroke-width='.6'/%3E%3Cpath d='M46 41L49 46L46 51L43 46Z'/%3E%3Ccircle cx='54' cy='54' r='1.4' fill='%23c9bfcc' stroke='none'/%3E%3Cpath d='M30 9C30 18 22 21 19 17C17 14 21 12 23 14'/%3E%3Cpath d='M9 30C18 30 21 22 17 19C14 17 12 21 14 23'/%3E%3C/g%3E%3C/svg%3E") left top/120px 120px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c9bfcc' stroke-width='1.1' stroke-linecap='round' transform='translate(120 0) scale(-1 1)'%3E%3Cpath d='M3 84V3H84'/%3E%3Cpath d='M9 62V9H62' stroke-width='.7'/%3E%3Cpath d='M84 3C96 3 101 13 94 18C89 22 83 17 87 13C89 11 92 12 92 14'/%3E%3Cpath d='M3 84C3 96 13 101 18 94C22 89 17 83 13 87C11 89 12 92 14 92'/%3E%3Cpath d='M9 9C25 12 34 22 38 38C22 34 12 25 9 9Z'/%3E%3Cpath d='M9 9L38 38' stroke-width='.6'/%3E%3Cpath d='M46 41L49 46L46 51L43 46Z'/%3E%3Ccircle cx='54' cy='54' r='1.4' fill='%23c9bfcc' stroke='none'/%3E%3Cpath d='M30 9C30 18 22 21 19 17C17 14 21 12 23 14'/%3E%3Cpath d='M9 30C18 30 21 22 17 19C14 17 12 21 14 23'/%3E%3C/g%3E%3C/svg%3E") right top/120px 120px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c9bfcc' stroke-width='1.1' stroke-linecap='round' transform='translate(0 120) scale(1 -1)'%3E%3Cpath d='M3 84V3H84'/%3E%3Cpath d='M9 62V9H62' stroke-width='.7'/%3E%3Cpath d='M84 3C96 3 101 13 94 18C89 22 83 17 87 13C89 11 92 12 92 14'/%3E%3Cpath d='M3 84C3 96 13 101 18 94C22 89 17 83 13 87C11 89 12 92 14 92'/%3E%3Cpath d='M9 9C25 12 34 22 38 38C22 34 12 25 9 9Z'/%3E%3Cpath d='M9 9L38 38' stroke-width='.6'/%3E%3Cpath d='M46 41L49 46L46 51L43 46Z'/%3E%3Ccircle cx='54' cy='54' r='1.4' fill='%23c9bfcc' stroke='none'/%3E%3Cpath d='M30 9C30 18 22 21 19 17C17 14 21 12 23 14'/%3E%3Cpath d='M9 30C18 30 21 22 17 19C14 17 12 21 14 23'/%3E%3C/g%3E%3C/svg%3E") left bottom/120px 120px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c9bfcc' stroke-width='1.1' stroke-linecap='round' transform='translate(120 120) scale(-1 -1)'%3E%3Cpath d='M3 84V3H84'/%3E%3Cpath d='M9 62V9H62' stroke-width='.7'/%3E%3Cpath d='M84 3C96 3 101 13 94 18C89 22 83 17 87 13C89 11 92 12 92 14'/%3E%3Cpath d='M3 84C3 96 13 101 18 94C22 89 17 83 13 87C11 89 12 92 14 92'/%3E%3Cpath d='M9 9C25 12 34 22 38 38C22 34 12 25 9 9Z'/%3E%3Cpath d='M9 9L38 38' stroke-width='.6'/%3E%3Cpath d='M46 41L49 46L46 51L43 46Z'/%3E%3Ccircle cx='54' cy='54' r='1.4' fill='%23c9bfcc' stroke='none'/%3E%3Cpath d='M30 9C30 18 22 21 19 17C17 14 21 12 23 14'/%3E%3Cpath d='M9 30C18 30 21 22 17 19C14 17 12 21 14 23'/%3E%3C/g%3E%3C/svg%3E") right bottom/120px 120px no-repeat;
+}
+@media (max-width: 768px) {
+  html.theme-dusk main::before { inset:48px 4px 4px 4px;background-size:72px 72px;opacity:.4; }
+}
+
+/* 写死蓝黑的主界面件，换成梅紫 */
+html.theme-dusk #sidebar { background:rgba(var(--bg-rgb),.9);border-right-color:rgba(var(--dk-silver-rgb),.12); }
+html.theme-dusk .sidebar-top { background:linear-gradient(to bottom,rgba(var(--dk-plum-rgb),.18) 0%,transparent 100%); }
+html.theme-dusk .sidebar-footer { background:linear-gradient(to bottom,transparent,rgba(var(--bg-rgb),.5)); }
+html.theme-dusk #footerMenu { background:rgba(var(--bg-rgb),.97); }
+html.theme-dusk header { background:rgba(var(--bg-rgb),.86);border-bottom-color:rgba(var(--dk-silver-rgb),.12); }
+html.theme-dusk .bubble.ai { background:rgba(49,34,53,.72);border-color:rgba(var(--dk-silver-rgb),.14); }
+html.theme-dusk .bubble.ai .bubble-quote { background:rgba(var(--dk-gold-rgb),.06); }
+html.theme-dusk .input-bar-wrap { --ib-rgb:var(--bg-rgb);background:linear-gradient(to bottom,transparent calc(var(--ib-pt) - 2px),rgba(var(--bg-rgb),.97) calc(var(--ib-pt) - 2px)); }
+html.theme-dusk .input-bar { background:rgba(49,34,53,.62);border-color:rgba(var(--dk-silver-rgb),.22); }
+html.theme-dusk .composer-tray:has(> :not([style*="none"])) { background:rgba(49,34,53,.62);border-color:rgba(var(--dk-silver-rgb),.22); }
+html.theme-dusk .settings-panel { background:rgba(var(--bg-rgb),.95);border-color:rgba(var(--dk-silver-rgb),.14); }
+html.theme-dusk .trash-card:hover { background:rgba(var(--dk-plum-rgb),.3) !important; }
+
+html.theme-dusk ::selection { background:rgba(var(--dk-gold-rgb),.85);color:var(--dk-ink); }
