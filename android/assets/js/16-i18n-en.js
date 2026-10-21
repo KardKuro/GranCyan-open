@@ -2515,7 +2515,6 @@ MAP: /*MAP-BEGIN*/{
 "回看板":"Back to board",
 "读不到":"Can't read",
 "工作台记录没读出来，这次的改动不会保存；稍后关掉重开再试":"The workbench records couldn't be loaded, so this change won't be saved; close and reopen later to try again",
-"项目目录 例如：D:\\code\\GranCyan":"Project directory, e.g. D:\\code\\GranCyan",
 "修改会话标题":"Rename session",
 "新任务":"New task",
 "会话标题已修改":"Session renamed",
