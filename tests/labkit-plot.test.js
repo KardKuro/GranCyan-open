@@ -195,7 +195,9 @@ t('★ 画图技能在开关表里、提示词在 buildSystemPrompt 里', /\{ ke
 
 console.log('\n[9] 打包：大件不进 git / exe / APK，小库跟着 APK 走');
 const pkg = read('package.json');
-t('★ exe 两条打包命令都忽略 labkit/（GeoGebra 50MB，进 asar 白胖）', (pkg.match(/--ignore=\\"\^\/labkit\(\$\|\/\)\\"/g) || []).length === 2);
+// 打包命令有几条（pack:exe / pack:exe:alt / pack:portable…）就得有几处忽略，别写死条数（加了便携版那条就假红过）
+{ const packs = Object.values(JSON.parse(pkg).scripts || {}).filter(s => /electron-packager/.test(s));
+  t('★ exe 的每条打包命令都忽略 labkit/（GeoGebra 50MB，进 asar 白胖）', packs.length >= 2 && packs.every(s => /--ignore=\"\^\/labkit\(\$\|\/\)\"/.test(s))); }
 t('★ .gitignore 有 labkit/', /^labkit\/$/m.test(read('.gitignore')));
 t('★ JSXGraph 放在 js/lib（APK 离线也能画）', fs.existsSync(path.join(ROOT, 'js/lib/jsxgraphcore.js')) && fs.existsSync(path.join(ROOT, 'js/lib/jsxgraph.css'))
   && /s\.src = '\.\/js\/lib\/jsxgraphcore\.js'/.test(src));

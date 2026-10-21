@@ -65,7 +65,11 @@ t('★ 页面加载 56-sims.js，有面板和「学习」架子上的入口', /<
 }
 
 console.log('\n[5] 打包：72MB 的实验只在电脑后端');
-t('★ labkit/ 不进 git、不进 exe', /^labkit\/$/m.test(read('.gitignore')) && (read('package.json').match(/--ignore=\\"\^\/labkit\(\$\|\/\)\\"/g) || []).length === 2);
+// 每条 electron-packager 打包命令都要忽略 labkit/（条数别写死：加了便携版那条就假红过）
+t('★ labkit/ 不进 git、不进 exe', /^labkit\/$/m.test(read('.gitignore')) && (() => {
+  const packs = Object.values(JSON.parse(read('package.json')).scripts || {}).filter(s => /electron-packager/.test(s));
+  return packs.length >= 2 && packs.every(s => /--ignore=\"\^\/labkit\(\$\|\/\)\"/.test(s));
+})());
 t('  下载脚本读的是同一份清单（vm 跑 56-sims.js），验完整性（</html> 结尾）',
   /js', '56-sims\.js'/.test(read('scripts/fetch-phet.js')) && /<\\\/html>/.test(read('scripts/fetch-phet.js')));
 {
