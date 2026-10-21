@@ -1,5 +1,7 @@
 # GranCyan
 
+**中文** | [English](README.en.md)
+
 > A self-hosted, multi-model AI chat app (desktop / Android / browser). Bring your own API key; everything stays local by default.
 
 多模型 AI 聊天应用。一份代码，三个形态：
@@ -11,6 +13,8 @@
 | 安卓 APK | `android/build.ps1` | WebView 加载 `android/assets/` 里的前端副本，连电脑上的 server |
 
 后端是单文件 Express（`server.js`），前端是一串裸 `<script>`（`js/01-core.js` … `js/71-*.js`，编号有空号）。
+
+> 界面默认中文，设置 → 外观 → 语言 可以切成英文（共读书架页还只有中文）。
 
 ## 下载
 
@@ -133,4 +137,4 @@ Copyright (C) 2026 KardKuro
 
 ---
 
-私人项目，没有对外支持计划。
+一个人维护。欢迎提 issue 和 PR，每条都会认真看，回得可能慢一些，请多包涵～
