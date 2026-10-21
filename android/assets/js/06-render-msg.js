@@ -121,7 +121,7 @@ function legacyThinkHtml(reasoning, streaming, thinkingSummary, thinkZh) {
   // 思考里抄了一遍 [[HIDE_LETTER:]] 的：纸条正文在她找到之前不许露（68-treasure.js）
   if (typeof treasureVeil === 'function') reasoning = treasureVeil(reasoning);
   const label = streaming ? '💭 思考中…'
-    : (thinkingSummary ? `💭 ${thinkVeil(escHtml(thinkingSummary))}` : '💭 思考过程');
+    : (thinkingSummary ? `💭 <span data-no-i18n>${thinkVeil(escHtml(thinkingSummary))}</span>` : '💭 思考过程');
   const doneClass = streaming ? '' : ' done';
   const openClass = streaming ? ' open' : '';
   const zh = streaming || !_thinkTransReal(reasoning, thinkZh?.[0]) ? '' : thinkZh[0];
@@ -410,7 +410,7 @@ function renderMessages() {
           </svg>
           <div class="empty-bg empty-grid" aria-hidden="true"></div>
           <img class="empty-icon" src="./img/empty-icon.png">
-          <div class="empty-title">${Array.from('在这里开始聊天吧 ‿︵‿', (c, i) => `<span style="--i:${i}">${c}</span>`).join('')}</div>
+          <div class="empty-title">${Array.from(typeof i18nText === 'function' ? i18nText('在这里开始聊天吧 ‿︵‿') : '在这里开始聊天吧 ‿︵‿', (c, i) => `<span style="--i:${i}">${c}</span>`).join('')}</div>
           <div class="empty-sub">${state.memories.length
             ? `(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ 记忆系统已激活 — 大家都记着你呢<br><br><span style="font-size:12px;opacity:.5">${state.memories.length} 条记忆 · ${state.configs.length} 个模型待命</span>`
             : `今天想聊点什么呢？(｀・ω・´)<br><br><span style="font-size:12px;opacity:.5">输入消息开始对话，或在设置里先配置 API Key</span>`
@@ -768,11 +768,11 @@ function renderMsgGroup(m, prevTimestamp, mode = _chatMode(getActiveChat()), con
   const senderLabel = !isGroup
     ? `<div class="msg-label">
         <span class="msg-label-dot" style="background:${modelColor}"></span>
-        <span class="accent-text" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">${escHtml(m.modelNickname||'AI')}</span>
+        <span class="accent-text" data-no-i18n style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">${escHtml(m.modelNickname||'AI')}</span>
         ${state.memories.length?`<span class="memory-badge">记忆</span>`:''}
       </div>`
     : cont ? ''
-    : `<div class="gc-sender-name" style="color:${modelColor}">${escHtml(m.modelNickname||'AI')}</div>`;
+    : `<div class="gc-sender-name" data-no-i18n style="color:${modelColor}">${escHtml(m.modelNickname||'AI')}</div>`;
 
   // 表情包拆气泡：流式期间不拆（bubble-${m.id} 是 renderLiveBubble 的落点，
   // 内容每帧都在变，拆了会打架）。语音走 voiceSegs 那条自己的路 —— 气泡里是播放器不是文本，

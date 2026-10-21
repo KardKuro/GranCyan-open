@@ -1554,7 +1554,7 @@ function _isCloseCtl(b) {
   const call = (b.getAttribute('onclick') || '').trim();
   if (call) return /(^|;)\s*close\w*\(\s*\)\s*;?\s*$/.test(call);
   if (/^[✕×✖xX]$/.test((b.textContent || '').trim())) return true;
-  if (/关闭/.test((b.getAttribute('title') || '') + (b.getAttribute('aria-label') || ''))) return true;
+  if (/关闭|^close$/i.test((b.getAttribute('title') || '') + (b.getAttribute('aria-label') || ''))) return true;
   return /(^|[-_\s])close\b/i.test(b.className || '');
 }
 // 捕获阶段：赶在按钮自己的 onclick 把弹窗藏掉之前记下「这是一次关闭」

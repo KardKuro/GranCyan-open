@@ -171,7 +171,8 @@ async function cwDeleteSession(id) {
   const found = cwFindSession(id); if (!found) return;
   if (found.s.status === 'running') { showToast('这条任务还在运行，请先停止，再移入回收站。', 'info'); return; }
   const yes = await appPrompt(`把“${found.s.title || '未命名会话'}”移入回收站？\n消息、思考和工具链都可以恢复。\n输入“删除”继续。`, '');
-  if (String(yes || '').trim() !== '删除') return;
+  // 英文界面里提示叫她输 delete（16-i18n-en.js 那条规则），两种都认
+  if (!['删除', 'delete'].includes(String(yes || '').trim().toLowerCase())) return;
   _cw.trash = Array.isArray(_cw.trash) ? _cw.trash : [];
   _cw.trash.unshift({ id: cwId('trash'), deletedAt: Date.now(), project: { id: found.p.id, name: found.p.name, cwd: found.p.cwd, provider: found.p.provider || 'codex' }, session: found.s });
   found.p.sessions = found.p.sessions.filter(x => x.id !== id); _cwAttachments.delete(id);
@@ -195,7 +196,7 @@ function cwRestoreSession(trashId) {
 async function cwDeleteTrashItem(trashId) {
   const item = (_cw.trash || []).find(x => x.id === trashId); if (!item) return;
   const yes = await appPrompt(`彻底删除“${item.session?.title || '未命名会话'}”？\n删除后无法恢复。\n输入“彻底删除”继续。`, '');
-  if (String(yes || '').trim() !== '彻底删除') return;
+  if (!['彻底删除', 'permanently delete'].includes(String(yes || '').trim().toLowerCase())) return;
   _cw.trash = _cw.trash.filter(x => x.id !== trashId); cwScheduleSave(); cwRender();
 }
 async function cwEmptyTrash() {
@@ -203,7 +204,7 @@ async function cwEmptyTrash() {
   const count = (_cw.trash || []).filter(x => (x.project?.provider || 'codex') === provider).length;
   if (!count) return;
   const yes = await appPrompt(`彻底清空当前后端回收站里的 ${count} 条会话？\n输入“清空”继续。`, '');
-  if (String(yes || '').trim() !== '清空') return;
+  if (!['清空', 'clear'].includes(String(yes || '').trim().toLowerCase())) return;
   _cw.trash = _cw.trash.filter(x => (x.project?.provider || 'codex') !== provider); cwScheduleSave(); cwRender(); showToast('回收站已清空。', 'success');
 }
 function cwSetModel(v) { const p = cwProject(); if (!p) return; p.models = p.models || {}; p.models[cwProvider(p)] = v; p.model = v; cwScheduleSave(); cwRender(); }

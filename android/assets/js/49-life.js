@@ -1033,7 +1033,7 @@ function _lifeAnnivHtml() {
       const card = lifeAnnivCard(a.id, y);
       const years = Object.keys(a.cards || {}).sort().reverse();
       return '<div class="life-anniv">'
-        + '<div class="life-anniv-h"><b>' + esc(a.name) + '</b>'
+        + '<div class="life-anniv-h"><b data-no-i18n>' + esc(a.name) + '</b>'   // 纪念日名字是她起的，英文界面不翻
         + '<span class="life-anniv-d">' + esc(a.date) + '</span>'
         + '<span class="life-anniv-n">' + (n === 0 ? '就是今天' : n == null ? '' : '还有 ' + n + ' 天') + '</span>'
         + '<button class="life-rdel" onclick="lifeAnnivRemove(' + _lifeAttr(a.id) + ')">✕</button></div>'

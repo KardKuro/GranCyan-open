@@ -133,7 +133,7 @@ function renderChatList() {
         ${groupAvatarHtml}
         <div class="chat-item-left">
           <div class="chat-item-title-row">
-            <span class="chat-item-title">${c.isPinned ? _sbIc('pin', 'chat-pin-ic') : ''}${escHtml(c.title)}</span>
+            <span class="chat-item-title">${c.isPinned ? _sbIc('pin', 'chat-pin-ic') : ''}<span data-no-i18n>${escHtml(c.title === '崭新の对话' && typeof i18nText === 'function' ? i18nText(c.title) : c.title)}</span></span>
             ${timeStr ? `<span class="chat-item-time">${timeStr}</span>` : ''}
           </div>
           <div class="chat-item-meta">
@@ -159,7 +159,8 @@ function renderChatList() {
 
   // 更新 header 标题和头像
   const activeChat = getActiveChat();
-  document.getElementById('currentChatTitle').innerText = activeChat?.title || '崭新の对话';
+  { const _ct = activeChat?.title || '崭新の对话';   // 标题是她起的，不进英文词典（#currentChatTitle 挂了 data-no-i18n）；默认那个照翻
+    document.getElementById('currentChatTitle').innerText = _ct === '崭新の对话' && typeof i18nText === 'function' ? i18nText(_ct) : _ct; }
   // 顶栏标题旁那枚「claude.ai 时期」：一进对话就知道这是哪个时候的
   const ccEra = document.getElementById('ccEraBadge');
   if (ccEra) {
@@ -1489,7 +1490,7 @@ function modelCardHtml(c, i) {
         <span class="model-card-caret ${open ? '' : 'folded'}">▾</span>
         ${c.avatar
           ? `<img class="model-card-dot" src="${c.avatar}">`
-          : `<span class="model-card-dot fallback" style="background:${getModelColor(c.id)}22;color:${getModelColor(c.id)}">${escHtml((c.nickname||'AI').slice(0,1))}</span>`}
+          : `<span class="model-card-dot fallback" style="background:${getModelColor(c.id)}22;color:${getModelColor(c.id)}" data-no-i18n>${escHtml((c.nickname||'AI').slice(0,1))}</span>`}
         <span class="model-card-name">${escHtml(c.nickname)}</span>
         <span class="model-card-sub">${escHtml(c.modelName || '')}</span>
         <button class="model-card-del" onclick="event.stopPropagation();removeModelConfig(${i})">✕</button>

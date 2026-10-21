@@ -31,7 +31,7 @@ t('注册按钮的 onclick 原样', html.includes(`<button onclick="handleAuth('
 for (const id of ['authEmail', 'authPassword', 'authPasswordConfirm', 'confirmPwdWrap', 'togglePwd', 'togglePwd2', 'authError', 'authErrorIcon', 'authErrorText', 'starCanvas'])
   t(`#${id} 还在`, html.includes(`id="${id}"`));
 const h2 = (html.slice(wallAt).match(/<h2[^>]*>([^<]*)<\/h2>/) || [])[1];
-t('标题文字没动（16-misc.js 的英文规则整句匹配它）', /^欢迎([\s\S]*?)回家 ✦ ·˚$/.test(h2 || ''), h2);
+t('标题文字没动（16-i18n-en.js 的英文规则整句匹配它）', /^欢迎([\s\S]*?)回家 ✦ ·˚$/.test(h2 || ''), h2);
 t('登录墙默认不挂 hidden（没登录的人第一眼要看得到它）', !/id="authModal"[^>]*\bhidden\b/.test(html));
 
 console.log('── 收启动页的三条路 ──');

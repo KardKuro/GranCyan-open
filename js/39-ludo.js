@@ -550,7 +550,14 @@ function _ludoRunway(k) {
   return out;
 }
 function _ludoHangarHtml(k, name) {
-  return `<div class="ludo-hangar ${k === 'user' ? 'u' : 'a'}"><div class="lh-head">${_ludoPlane(k)}<b>${name}</b></div><div class="lh-slots">${_ludoHangar(k)}</div><small class="lh-steps">第 <b>${_ludo.planes[k].join(' / ')}</b> 步</small></div>`;
+  return `<div class="ludo-hangar ${k === 'user' ? 'u' : 'a'}"><div class="lh-head">${_ludoPlane(k)}<b>${name}</b></div><div class="lh-slots">${_ludoHangar(k)}</div><small class="lh-steps">${_ludoStepsHtml(k)}</small></div>`;
+}
+// 「第 3 / 0 步」：数字加粗会把句子切成「第」「步」两半，英文界面两半都查不到。
+// 先整句过一遍 i18nText（中文界面原样返回），再把数字那段加粗
+function _ludoStepsHtml(k) {
+  const n = _ludo.planes[k].join(' / ');
+  const s = typeof i18nText === 'function' ? i18nText('第 ' + n + ' 步') : '第 ' + n + ' 步';
+  return s.replace(n, '<b>' + n + '</b>');
 }
 
 function renderLudo() {

@@ -299,8 +299,9 @@ function wishbookHtml() {
   if (opened.length) {
     h += `<div class="wishbook-sec">翻给你看过的</div>`;
     for (const e of opened) {
-      h += `<div class="wishbook-open"><b>${_wsEsc(e.item)}</b>`
-        + (e.why ? `<p>${_wsEsc(e.why)}</p>` : '')
+      // 写的是什么、为什么：它写的原话，英文界面也不翻（data-no-i18n）；下面那行日期是界面字照翻
+      h += `<div class="wishbook-open"><b data-no-i18n>${_wsEsc(e.item)}</b>`
+        + (e.why ? `<p data-no-i18n>${_wsEsc(e.why)}</p>` : '')
         + `<span>${_wsEsc(e.w || 'AI')} · ${_wsEsc(_wsDay(e.at))} 记下 · ${_wsEsc(_wsDay(e.open))} 翻开</span></div>`;
     }
   }

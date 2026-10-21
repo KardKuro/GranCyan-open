@@ -210,7 +210,7 @@
 
 <!-- ── Auth Modal (登录框) ── 样式在 css/boot.css。
      ⚠️ handleAuth 靠 button[onclick="handleAuth('login')"] 这串属性找按钮，onclick 一个字都别改；
-        h2 的文字也别动，16-misc.js 的英文规则按它整句匹配。 -->
+        h2 的文字也别动，16-i18n-en.js 的英文规则按它整句匹配。 -->
 <div id="authModal" class="auth-wall">
   <div class="auth-bg" aria-hidden="true">
     <i class="auth-glow g1"></i><i class="auth-glow g2"></i><i class="auth-glow g3"></i>
@@ -354,7 +354,7 @@
       <button class="menu-btn" onclick="toggleSidebar()">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <span id="currentChatTitle">崭新の对话</span>
+      <span id="currentChatTitle" data-no-i18n>崭新の对话</span>
       <span id="ccEraBadge" class="cc-badge cc-era hidden" title="从 claude.ai 导入的老对话">claude.ai 时期</span>
     </div>
     <div class="header-right">
@@ -1754,7 +1754,7 @@
     </div>
     <div class="cap-toolbar wb-toolbar">
       <label class="diary-switch"><input type="checkbox" id="worldbookToggle" onchange="wbSetConfig({on:this.checked});worldbookRefresh(true)"> 接入对话</label>
-      <label class="wb-tool-f" title="翻出来的条目加起来最多占多少字；超了按优先级从低往高扔">总长上限 <input type="number" id="worldbookBudget" class="field-input" min="200" max="20000" step="100" onchange="wbSetConfig({budget:this.value});worldbookRefresh(true)"> 字</label>
+      <label class="wb-tool-f" title="翻出来的条目加起来最多占多少字；超了按优先级从低往高扔">总长上限 <input type="number" id="worldbookBudget" class="field-input" min="200" max="20000" step="100" onchange="wbSetConfig({budget:this.value});worldbookRefresh(true)"> <span data-i18n-block>字</span></label>
       <label class="wb-tool-f" title="看最近几条消息里有没有触发词">看最近 <select id="worldbookDepth" class="field-input" onchange="wbSetConfig({depth:this.value})"><option value="1">1 条（只看她这句）</option><option value="2">2 条（加上它上一句）</option><option value="4">4 条</option><option value="6">6 条</option><option value="10">10 条</option></select></label>
       <span class="wb-tool-gap"></span>
       <button class="wb-mini" onclick="worldbookEdit('new')">＋ 新条目</button>
@@ -2751,6 +2751,10 @@
 <script src="./js/15-terminal.js"></script>
 
 <!-- ===== i18n (Chinese -> English) — injected by language feature ===== -->
+<!-- 词典在前（window.GRANCYAN_I18N_EN），机制在后。
+     词典几百 KB，只有选了 English 才载（document.write 在解析期同步插入，照样排在 16-misc.js 前面）；
+     中文界面（平时）连下载带解析都省掉 -->
+<script>try { if (localStorage.getItem('grancyanLang') === 'en') document.write('<script src="./js/16-i18n-en.js"><\/script>'); } catch (e) {}</script>
 <script src="./js/16-misc.js"></script>
 <script src="./js/41-code-workbench.js"></script>
 <script src="./js/45-ued.js"></script>

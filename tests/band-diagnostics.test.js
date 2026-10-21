@@ -47,6 +47,8 @@ t('设备状态不是 device 的（offline 等）也单独报',
 
 console.log('\n[2] 设备状态是**查**出来的，不是等 pull 失败才猜');
 t('有 adbDeviceState()', /function adbDeviceState\(\)/.test(server));
+// 一次性 server（测试 / 英文界面爬虫）把 GRANCYAN_ADB 指到不存在的路径，开页面就不会去碰真手机
+t('adb 路径能用 GRANCYAN_ADB 改指别处', /if \(process\.env\.GRANCYAN_ADB\) return process\.env\.GRANCYAN_ADB;/.test(server));
 t('先看 adb 这个 exe 在不在', /if \(!fs\.existsSync\(ADB_EXE\)\) return \{ state: 'adb-missing' \}/.test(server));
 t('解析 adb devices 的输出（跳过表头那行）',
   /adbOut\('devices'\)/.test(server) && /\.split\('\\n'\)\.slice\(1\)/.test(server));

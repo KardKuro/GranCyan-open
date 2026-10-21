@@ -70,7 +70,7 @@ function _monoCellHtml(c,i,an){
 }
 function _monoPlayerHtml(k,name){
   const p=_mono.players[k],w=_monoWorth(k),pct=Math.max(0,Math.min(100,Math.round(w/18)));
-  return`<div class="mono-player ${k==='user'?'u':'a'} ${!_mono.over&&_mono.turn===k?'active':''}">${_monoToken(k)}<div class="mp-main"><b>${name}</b><span class="mp-cash">${p.cash}<small>币</small></span></div><div class="mp-bar"><i style="width:${pct}%"></i></div><small class="mp-worth">资产 ${w} / 1800</small></div>`;
+  return`<div class="mono-player ${k==='user'?'u':'a'} ${!_mono.over&&_mono.turn===k?'active':''}">${_monoToken(k)}<div class="mp-main"><b>${name}</b><span class="mp-cash">${p.cash}<small data-i18n-block>币</small></span></div><div class="mp-bar"><i style="width:${pct}%"></i></div><small class="mp-worth">资产 ${w} / 1800</small></div>`;
 }
 function renderMonopoly(){
   const b=document.getElementById('monopolyBody');if(!b||!_mono)return;

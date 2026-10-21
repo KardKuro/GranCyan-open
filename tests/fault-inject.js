@@ -85,6 +85,10 @@ const MSB = path.join(ROOT, 'server', 'movie-subs.js');
 // 2026-10-03：本地情绪声音（CosyVoice3）
 const VSF = path.join(ROOT, 'js', 'voice-style.js');
 const TLO = path.join(ROOT, 'server', 'tts-local.js');
+// 2026-10-21：英文界面（词典 / 机制 / 一次性 server 不碰真手机）
+const I18M = path.join(ROOT, 'js', '16-misc.js');
+const I18D = path.join(ROOT, 'js', '16-i18n-en.js');
+const BND = path.join(ROOT, 'server', 'band.js');
 const BROWSER_MARK = 'tests/browser-mark.js';
 
 const CASES_1 = [
@@ -2619,7 +2623,7 @@ const CASES_45 = [
     to:   "  const body = escHtml(text);",
     expect: /thinkBodyHtml 自己也包/ },
   { name: '思考·ds 概括没糊（一句概括把整段思考剧透了）', file: A,
-    from: "        : (thinkingSummary ? `\u{1f4ad} ${thinkVeil(escHtml(thinkingSummary))}` : '\u{1f4ad} 思考过程');",
+    from: "        : (thinkingSummary ? `\u{1f4ad} <span data-no-i18n>${thinkVeil(escHtml(thinkingSummary))}</span>` : '\u{1f4ad} 思考过程');",
     to:   "        : `\u{1f4ad} ${thinkingSummary || '思考过程'}`;",
     expect: /概括都包进了糊面/ },
   { name: '思考·流式途中那条没包（思考中的字是明着的）', file: A,
@@ -4134,7 +4138,140 @@ const CASES_74 = [
     expect: null },
 ];
 
-const CASES = [..._g(1, CASES_1), ..._g(2, CASES_2), ..._g(3, CASES_3), ..._g(4, CASES_4), ..._g(5, CASES_5), ..._g(6, CASES_6), ..._g(7, CASES_7), ..._g(8, CASES_8), ..._g(9, CASES_9), ..._g(10, CASES_10), ..._g(11, CASES_11), ..._g(12, CASES_12), ..._g(14, CASES_14), ..._g(16, CASES_16), ..._g(18, CASES_18), ..._g(20, CASES_20), ..._g(21, CASES_21), ..._g(22, CASES_22), ..._g(23, CASES_23), ..._g(24, CASES_24), ..._g(25, CASES_25), ..._g(26, CASES_26), ..._g(27, CASES_27), ..._g(28, CASES_28), ..._g(29, CASES_29), ..._g(30, CASES_30), ..._g(31, CASES_31), ..._g(32, CASES_32), ..._g(33, CASES_33), ..._g(34, CASES_34), ..._g(35, CASES_35), ..._g(36, CASES_36), ..._g(37, CASES_37), ..._g(38, CASES_38), ..._g(39, CASES_39), ..._g(40, CASES_40), ..._g(41, CASES_41), ..._g(42, CASES_42), ..._g(43, CASES_43), ..._g(44, CASES_44), ..._g(45, CASES_45), ..._g(46, CASES_46), ..._g(47, CASES_47), ..._g(48, CASES_48), ..._g(49, CASES_49), ..._g(50, CASES_50), ..._g(51, CASES_51), ..._g(61, CASES_61), ..._g(62, CASES_62), ..._g(64, CASES_64), ..._g(66, CASES_66), ..._g(65, CASES_65), ..._g(63, CASES_63), ..._g(67, CASES_67), ..._g(69, CASES_69), ..._g(70, CASES_70), ..._g(71, CASES_71), ..._g(73, CASES_73), ..._g(74, CASES_74)];
+// 70 — 英文界面（2026-10-21，i18n-en，从主仓搬过来）：词典在 js/16-i18n-en.js，机制在 16-misc.js。
+// ⚠️ CASES_70 那个名字已经被藏宝地图占了，这一组叫 CASES_70_I18N，组号照样记 70：
+//    `--group=70` 会连藏宝那组一起跑，`--only=英文界面` 只跑这组。
+// 和主仓那组的差别：open 的天气页没有报纸背景（那条拿掉了）；adb 路径那条按 open 的 findAdb() 写；
+// 多一条「公开仓的词典多拷了 open 没有的字」。
+const CASES_70_I18N = [
+  { name: '★★ 英文界面·消息气泡不再跳过（她发的「删除」、AI 回的「好的」被换成英文）', file: I18M,
+    from: "var NO_I18N = '[data-no-i18n],.bubble,.bubble-quote,.think-body,.user-thinking-body,' +",
+    to:   "var NO_I18N = '[data-no-i18n],' +",
+    expect: /AI 回复正文里的「好的」「删除」原样|她发的「删除」原样/ },
+  { name: '★★ 英文界面·流式改气泡时照样去查词典、跑规则', file: I18M,
+    from: 'if (p && !SKIP[p.nodeName] && !blockedEl(p)) applyText(m.target);',
+    to:   'if (p && !SKIP[p.nodeName]) applyText(m.target);',
+    expect: /流式改气泡时一条规则都没跑|流式改字后气泡里还是中文/ },
+  { name: '★ 英文界面·气泡里的界面零件（思考块标题）也跟着不翻了', file: I18M,
+    from: "var OPT_IN = '[data-i18n],.think-toggle,.msg-attach-meta';",
+    to:   "var OPT_IN = '[data-i18n]';",
+    expect: /思考块标题/ },
+  { name: '★★ 英文界面·功能指南整段换不进去（退回一个个碎片拼）', file: I18M,
+    from: 'if (HAS.call(HTML, k)) {',
+    to:   'if (false) {',
+    expect: /功能指南整段按 innerHTML/ },
+  { name: '★ 英文界面·被 <b> 切开的半句不补空格（粘成 TapSettings）', file: I18M,
+    from: "lead = ' ';",
+    to:   "lead = '';",
+    expect: /补上空格/ },
+  { name: '★★ 英文界面·整句查不到了（词典形同虚设）', file: I18M,
+    from: 'function exact(key){',
+    to:   'function exact(key){ return null;',
+    expect: /静态文字 \+ 属性覆盖率|整句/ },
+  { name: '★ 英文界面·剥符号的整句不再先于宽规则（「🗑 删除」被 ^🗑 (.*) 抢走）', file: I18M,
+    from: 't = decor(key, full, false);',
+    to:   't = null;',
+    expect: /先于宽规则/ },
+  { name: '★ 英文界面·规则里填进去的中文不再各自查一遍', file: I18M,
+    from: 'return q1 + ((q1 && q2) ? g : slot(g)) + q2;',
+    to:   'return q1 + g + q2;',
+    expect: /填进去的中文也翻/ },
+  { name: '★★ 英文界面·词典里重复的 key（JSON.parse 悄悄留后一条）', file: I18D,
+    from: '"语言":"Language",',
+    to:   '"语言":"Language",\n"语言":"Language",',
+    expect: /没有重复 key/ },
+  { name: '★ 英文界面·英文里混进中文', file: I18D,
+    from: '"语言":"Language",',
+    to:   '"语言":"Language 语言",',
+    expect: /英文里没有中文/ },
+  { name: '★ 英文界面·整段换的英文标签和中文对不上', file: I18D,
+    from: 'tap the red <b>■ Stop</b> button on the right of the input box',
+    to:   'tap the red <i>■ Stop</i> button on the right of the input box',
+    expect: /标签和中文一模一样/ },
+  { name: '★ 英文界面·规则带了 g（test 有状态，隔一次失灵）', file: I18D,
+    from: "[/^租(\\d+)$/, 'Rent $1'],",
+    to:   "[/^租(\\d+)$/g, 'Rent $1'],",
+    expect: /RULES \d+ 条都能编译/ },
+  { name: '★★ 英文界面·公开仓的词典多拷了一条 open 源码里没有的（主仓独有的功能跟着公开出去）', file: I18D,
+    from: '"语言":"Language",',
+    to:   '"语言":"Language",\n"这一句只在别的仓库里有":"Only elsewhere",',
+    expect: /MAP 的每个 key 都在 open 源码里有出处/ },
+  { name: '★ 英文界面·公开仓的词典混进一条只有两个字、但带英文的词条（「Play 模式」这种别处的开关）', file: I18D,
+    from: '"语言":"Language",',
+    to:   '"语言":"Language",\n"Zork 模式":"Zork mode",',
+    expect: /MAP 的每个 key 都在 open 源码里有出处/ },
+  { name: '★ 英文界面·公开仓的词典段里带进了主仓的注释（会点名那边独有的功能）', file: I18D,
+    from: '// @@NEW@@',
+    to:   '// ── 手补：别处那个功能的分区 ──\n// @@NEW@@',
+    expect: /词条段里没有注释/ },
+  { name: '★ 英文界面·公开仓的词典多拷了一段 open 没有的功能指南', file: I18D,
+    from: '// @@NEWHTML@@',
+    to:   '"别的仓库才有的一段<b>说明</b>":"A paragraph from <b>elsewhere</b>",\n// @@NEWHTML@@',
+    expect: /HTML 段的每段都在 open 源码里原样出现过/ },
+  { name: '★ 英文界面·公开仓的词典多拷了一条 open 没有的规则', file: I18D,
+    from: '  // @@NEWRULES@@',
+    to:   "  [/^别的仓库才有的(\\d+)条规则$/, 'Rule $1 from elsewhere'],\n  // @@NEWRULES@@",
+    expect: /RULES 每一截带中文的字面都在 open 源码里出现过/ },
+  { name: '★ 英文界面·公开仓的词典多拷了一条 open 没有的规则（中文全在分组里）', file: I18D,
+    from: '  // @@NEWRULES@@',
+    to:   "  [/^(别的仓库才有|另一个功能) ×(\\d+)$/, 'Elsewhere ×$2'],\n  // @@NEWRULES@@",
+    expect: /RULES 每一截带中文的字面都在 open 源码里出现过/ },
+  { name: '★ 英文界面·index.html 不加载词典', file: H,
+    from: "document.write('<script src=\"./js/16-i18n-en.js\"><\\/script>');",
+    to:   '0;',
+    expect: /词典在机制前面加载|只在选了 English 时才载/ },
+  { name: '★★ 英文界面·工作台「输入 删除 继续」只认中文（英文提示叫她输 delete，永远删不掉）', file: W,
+    from: "if (!['删除', 'delete'].includes(String(yes || '').trim().toLowerCase())) return;",
+    to:   "if (String(yes || '').trim() !== '删除') return;",
+    expect: /也认 delete/ },
+  { name: '★ 英文界面·空对话大标题拆字前不先整句翻', file: RM,
+    from: "${Array.from(typeof i18nText === 'function' ? i18nText('在这里开始聊天吧 ‿︵‿') : '在这里开始聊天吧 ‿︵‿', (c, i)",
+    to:   "${Array.from('在这里开始聊天吧 ‿︵‿', (c, i)",
+    expect: /大标题先 i18nText/ },
+  { name: '★★ 英文界面·adb 路径不能用 GRANCYAN_ADB 改（一次性 server 开页面就去碰真手机）', file: BND,
+    from: 'if (process.env.GRANCYAN_ADB) return process.env.GRANCYAN_ADB;',
+    to:   '',
+    expect: /GRANCYAN_ADB/ },
+  { name: '★ 英文界面·中文界面也建那张几百 KB 的词典', file: I18D,
+    from: 'if (!on && !window.GRANCYAN_I18N_FORCE) return;',
+    to:   '',
+    expect: /中文界面不建词典/ },
+  { name: '★★ 英文界面·长消息（附件卡）正文不再跳过', file: I18M,
+    from: "'.msg-attach-body,' +",
+    to:   "'' +",
+    expect: /长消息，正文原样/ },
+  { name: '★★ 英文界面·思考概括不包 data-no-i18n（模型写的概括被翻）', file: RM,
+    from: "`💭 <span data-no-i18n>${thinkVeil(escHtml(thinkingSummary))}</span>`",
+    to:   "`💭 ${thinkVeil(escHtml(thinkingSummary))}`",
+    expect: /思考概括包在 data-no-i18n 里/ },
+  { name: '★★ 英文界面·没锚的规则把后面那截吃掉（建群的模型列表、表情文件名没了）', file: I18M,
+    from: ': key.replace(e[0], function(){ return fill(to, arguments); });',
+    to:   ': fill(to, e[0].exec(key));',
+    expect: /没写 \$ 锚的规则只换匹配到的那段/ },
+  { name: '★ 英文界面·预筛把分组里的字当成必有（1~9 月永远跳过）', file: I18M,
+    from: "for (var guard = 0; guard < 20 && /\\([^()]*\\)/.test(s); guard++) s = s.replace(/\\([^()]*\\)[?*+]?(\\{[^}]*\\})?/g, ' ');",
+    to:   '',
+    expect: /带分支的规则不会被预筛误杀/ },
+  { name: '★★ 英文界面·引号里她起的名字也拿去查词典', file: I18M,
+    from: 'return q1 + ((q1 && q2) ? g : slot(g)) + q2;',
+    to:   'return q1 + slot(g) + q2;',
+    expect: /引号里的名字原样放回/ },
+  { name: '★ 英文界面·规则翻出半截中英混排也照用', file: I18M,
+    from: 'if (!mixed(out)) return out;',
+    to:   'return out;',
+    expect: /整句留中文/ },
+  { name: '★ 英文界面·分桶改了规则的先后', file: I18M,
+    from: 'var e = (ib >= B.length || (ia < A.length && A[ia][3] < B[ib][3])) ? A[ia++] : B[ib++];',
+    to:   'var e = ia < A.length ? A[ia++] : B[ib++];',
+    expect: /按词典里的先后/ },
+  // 对照组原来是「多一行注释」；公开仓不许词条段里有注释了（[1c]），改成多一个空行——同样是不改语义的改动
+  { name: '英文界面·对照组：MAP 段里多一个空行（还是同一份 JSON）', file: I18D,
+    from: '// @@NEW@@',
+    to:   '\n// @@NEW@@',
+    expect: null },
+];
+
+const CASES = [..._g(1, CASES_1), ..._g(2, CASES_2), ..._g(3, CASES_3), ..._g(4, CASES_4), ..._g(5, CASES_5), ..._g(6, CASES_6), ..._g(7, CASES_7), ..._g(8, CASES_8), ..._g(9, CASES_9), ..._g(10, CASES_10), ..._g(11, CASES_11), ..._g(12, CASES_12), ..._g(14, CASES_14), ..._g(16, CASES_16), ..._g(18, CASES_18), ..._g(20, CASES_20), ..._g(21, CASES_21), ..._g(22, CASES_22), ..._g(23, CASES_23), ..._g(24, CASES_24), ..._g(25, CASES_25), ..._g(26, CASES_26), ..._g(27, CASES_27), ..._g(28, CASES_28), ..._g(29, CASES_29), ..._g(30, CASES_30), ..._g(31, CASES_31), ..._g(32, CASES_32), ..._g(33, CASES_33), ..._g(34, CASES_34), ..._g(35, CASES_35), ..._g(36, CASES_36), ..._g(37, CASES_37), ..._g(38, CASES_38), ..._g(39, CASES_39), ..._g(40, CASES_40), ..._g(41, CASES_41), ..._g(42, CASES_42), ..._g(43, CASES_43), ..._g(44, CASES_44), ..._g(45, CASES_45), ..._g(46, CASES_46), ..._g(47, CASES_47), ..._g(48, CASES_48), ..._g(49, CASES_49), ..._g(50, CASES_50), ..._g(51, CASES_51), ..._g(61, CASES_61), ..._g(62, CASES_62), ..._g(64, CASES_64), ..._g(66, CASES_66), ..._g(65, CASES_65), ..._g(63, CASES_63), ..._g(67, CASES_67), ..._g(69, CASES_69), ..._g(70, CASES_70), ..._g(71, CASES_71), ..._g(73, CASES_73), ..._g(74, CASES_74), ..._g(70, CASES_70_I18N)];
 
 // 跑哪些测试。**新加了守安全判据的测试文件就要加进来** ——
 // 漏了的话，拆掉那处修复它照样「全绿」，这个脚本就白跑了。
@@ -4192,7 +4329,9 @@ const SUITES = ['tests/social.test.js', 'tests/origin-guard.test.js',
                 // 2026-10-12：表情包「不给 AI 用」开关
                 'tests/sticker-off.test.js',
                 // 2026-10-14：背景 / 字色自己调
-                'tests/custom-tone.test.js'];
+                'tests/custom-tone.test.js',
+                // 2026-10-21：英文界面（词典完整性 / 消息正文不翻 / 静态覆盖率 / 只收 open 有的字）+ adb 路径能改指
+                'tests/i18n-en.test.js', 'tests/band-diagnostics.test.js'];
 
 function run(includeBrowser = false) {
   const red = [];
@@ -4243,7 +4382,7 @@ function run(includeBrowser = false) {
 const crypto = require('crypto');
 const BAK = path.join(__dirname, '.fault-inject-bak');
 const MANI = path.join(BAK, 'manifest.json');
-const FILES = [F, G, O, S, A, W, WEA, C, X, H, M, ST, B, UE, VT, BT, CR, RD, LF, AP, TT, RM, FI, CM, ET, ME, FL, SY, MS, MM, SV, FG, CT, RX, SPK, PS1, FI2, DY, PK, CL, CC, IMM, WB, PH, THT, HC, SH, MP, CCP, ER, MSB, VSF, TLO, ALB, TRE, BLK, LTP, DRM, SNAP, CPK];
+const FILES = [F, G, O, S, A, W, WEA, C, X, H, M, ST, B, UE, VT, BT, CR, RD, LF, AP, TT, RM, FI, CM, ET, ME, FL, SY, MS, MM, SV, FG, CT, RX, SPK, PS1, FI2, DY, PK, CL, CC, IMM, WB, PH, THT, HC, SH, MP, CCP, ER, MSB, VSF, TLO, ALB, TRE, BLK, LTP, DRM, SNAP, CPK, I18M, I18D, BND];
 const sha = (s) => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
 const ORIG = {};
 let restored = false;

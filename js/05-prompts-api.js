@@ -2573,7 +2573,7 @@ function renderBlocksHtml(blocks, streaming, thinkingSummary, memSummaries, thin
       // 概括那句是 DeepSeek 写的，糊面要盖住它；「思考中…」「思考过程」只是状态词，
       // 不含内容，糊了反而看不出这块是什么。顺手补了 escHtml —— 概括是模型吐的文本。
       const label = isActive ? '💭 思考中…'
-        : (thinkingSummary ? `💭 ${thinkVeil(escHtml(thinkingSummary))}` : '💭 思考过程');
+        : (thinkingSummary ? `💭 <span data-no-i18n>${thinkVeil(escHtml(thinkingSummary))}</span>` : '💭 思考过程');
       // 流式途中不提示：这一刻正文可能只是还没到，说"拿不到"就成了误报
       // 流式途中还没翻，不出译文也不出切换钮；存着的是拒绝也当没译文（_thinkTransReal）
       const zh = isActive || !_thinkTransReal(b.text, thinkZh?.[thinkIdx]) ? '' : thinkZh[thinkIdx];
